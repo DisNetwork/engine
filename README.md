@@ -12,4 +12,4 @@ Where the DisNetwork magic happens here.
 - [ ] Add `Bot Manager` that manages what to do with the bot
 - [ ] Add Managers
   - [ ] `Start` that manages the start process of the bot
-  - [ ] `Message` that manages stuff like Send, Update
+  - [ ] `Message` that manages stuff like Send, Update 
