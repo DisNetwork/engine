@@ -9,7 +9,7 @@ export declare class BotExecutor {
  * The way to let the engine to execute it
  */
 export declare enum BotExecuteType {
-    
+
     /**
      * Runs a gateway to receive events and set the activity of the bot
      */
