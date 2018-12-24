@@ -22,6 +22,6 @@
     },
     "homepage": "https://github.com/DisNetwork/engine#readme",
     "dependencies": {
-        "@disnetwork/core": "0.0.11"
+        "@disnetwork/core": "0.0.12"
     }
 }
