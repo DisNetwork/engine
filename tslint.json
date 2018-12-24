@@ -5,7 +5,9 @@
     ],
     "jsRules": {},
     "rules": {
-        "max-classes-per-file": false
+        "max-classes-per-file": false,
+        "trailing-comma": false,
+        "interface-name": false
     },
     "rulesDirectory": []
 }
