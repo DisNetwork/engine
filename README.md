@@ -4,9 +4,7 @@ Where the DisNetwork magic happens here.
 ## Changelog
 
 ### **0.1 - `Not released`**
-> Under working
->
-> `*` Required to do
+> We are still working on it
 
 No pull requests here.
 
