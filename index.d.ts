@@ -13,33 +13,33 @@ export declare interface Manager {
  * Controlling the way to log in console
  */
 export declare class Logger {
-    
+
     constructor(level: LoggerLevel, prefix: string);
 
     /**
      * Log with the customize of the level
      */
-    print(level: LoggerLevel, message: string): void;
+    public print(level: LoggerLevel, message: string): void;
 
     /**
      * Log with error level
      */
-    err(message: string): void;
+    public err(message: string): void;
 
     /**
      * Log with warn level
      */
-    warn(message: string): void;
+    public warn(message: string): void;
 
     /**
      * Log with info level
      */
-    info(message: string): void;
+    public info(message: string): void;
 
     /**
      * Log with debug level
      */
-    debug(message: string): void;
+    public debug(message: string): void;
 }
 
 /**
