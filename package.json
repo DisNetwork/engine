@@ -20,5 +20,8 @@
     "bugs": {
         "url": "https://github.com/DisNetwork/engine/issues"
     },
-    "homepage": "https://github.com/DisNetwork/engine#readme"
+    "homepage": "https://github.com/DisNetwork/engine#readme",
+    "dependencies": {
+        "@disnetwork/core": "0.0.11"
+    }
 }
