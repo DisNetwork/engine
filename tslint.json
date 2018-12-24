@@ -10,7 +10,8 @@
         "interface-name": false,
         "quotemark": false,
         "no-console": false,
-        "no-trailing-whitespace": true
+        "no-trailing-whitespace": true,
+        "ordered-imports": false
     },
     "rulesDirectory": []
 }
