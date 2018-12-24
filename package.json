@@ -1,24 +1,24 @@
 {
-  "name": "engine",
-  "version": "0.0.1",
-  "description": "Where the DisNetwork magic happens here",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/DisNetwork/engine.git"
-  },
-  "keywords": [
-    "Engine",
-    "JS",
-    "DisNetwork"
-  ],
-  "author": "DisNetwork",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/DisNetwork/engine/issues"
-  },
-  "homepage": "https://github.com/DisNetwork/engine#readme"
+    "name": "@disnetwork/engine",
+    "version": "0.0.1",
+    "description": "Where the DisNetwork magic happens here",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/DisNetwork/engine.git"
+    },
+    "keywords": [
+        "Engine",
+        "JS",
+        "DisNetwork"
+    ],
+    "author": "DisNetwork",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/DisNetwork/engine/issues"
+    },
+    "homepage": "https://github.com/DisNetwork/engine#readme"
 }
