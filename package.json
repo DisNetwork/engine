@@ -3,6 +3,7 @@
     "version": "0.0.1",
     "description": "Where the DisNetwork magic happens here",
     "main": "index.js",
+    "type": "index.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
