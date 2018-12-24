@@ -8,8 +8,6 @@ Where the DisNetwork magic happens here.
 >
 > `*` Required to do
 
-- [ ] Build the basics*
-- [ ] Add `Bot Manager` that manages what to do with the bot
-- [ ] Add Managers
-  - [ ] `Start` that manages the start process of the bot
-  - [ ] `Message` that manages stuff like Send, Update 
+No pull requests here.
+
+Checkout our [Trello](https://trello.com/b/TWN05AAJ/disnetwork)
