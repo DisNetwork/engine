@@ -1,4 +1,22 @@
 /**
+ * Executes the bot ( You can create only one instance )
+ */
+export declare class BotExecutor {
+    public constructor(token: string, type: BotExecuteType);
+}
+
+/**
+ * The way to let the engine to execute it
+ */
+export declare enum BotExecuteType {
+    
+    /**
+     * Runs a gateway to receive events and set the activity of the bot
+     */
+    GATEWAY
+}
+
+/**
  * A manager that can be executed
  */
 export declare interface Manager {
