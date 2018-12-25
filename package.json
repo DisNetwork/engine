@@ -24,5 +24,12 @@
     "homepage": "https://github.com/DisNetwork/engine#readme",
     "dependencies": {
         "@disnetwork/core": "0.0.13"
+        "@disnetwork/core": "0.0.12",
+        "request": "^2.88.0",
+        "ws": "^6.1.2"
+    },
+    "devDependencies": {
+        "@types/request": "^2.48.1",
+        "@types/ws": "^6.0.1"
     }
 }

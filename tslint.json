@@ -11,7 +11,8 @@
         "quotemark": false,
         "no-console": false,
         "no-trailing-whitespace": true,
-        "ordered-imports": false
+        "ordered-imports": false,
+        "object-literal-sort-keys": false
     },
     "rulesDirectory": []
 }
