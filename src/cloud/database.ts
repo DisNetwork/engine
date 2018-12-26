@@ -1,8 +1,10 @@
 import { SnowFlake, Guild, Channel, User } from '@disnetwork/core';
+import { CoreGuild } from '../core/guild';
 
 export namespace CloudDatabase {
 
     export interface Guilds {
+        add(id: CoreGuild): void;
         get(id: SnowFlake): Guild;
         has(id: SnowFlake): boolean;
     }
