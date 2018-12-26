@@ -7,4 +7,9 @@ export namespace CloudDatabase {
         has(id: SnowFlake): boolean;
     }
 
+    export interface Channels {
+        get(id: SnowFlake): any;
+        has(id: SnowFlake): boolean;
+    }
+
 }
