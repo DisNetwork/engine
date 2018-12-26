@@ -25,6 +25,13 @@ export class CoreGuilds implements Guilds {
         this.guilds = new Map();
     }
 
+    public add(guild: CoreGuild): void {
+        if (this.has(guild.id)) {
+            return;
+        }
+        this.guilds.set(guild.id, guild);
+    }
+
     public get(id: SnowFlake): CoreGuild {
         if (this.has(id)) {
             const guild: CoreGuild | undefined = this.guilds.get(id);
