@@ -51,13 +51,15 @@ export class GatewayManager implements Manager {
 
     private send(message: GatewayMessage) {
         if (this.webSocket) {
-            this.logger.debug("[Gateway] <- " + JSON.stringify(message));
-            this.webSocket.send(JSON.stringify(message.encode()));
+            const json: string = JSON.stringify(message.encode());
+            this.logger.debug("[Gateway] <- " + json);
+            this.webSocket.send(json);
         }
     }
 
     private onConnect(): void {
         this.logger.info("[Gateway] Connected!");
+        this.lifecycle();
     }
 
     private onMessage(data: WebSocket.Data): void {
@@ -67,7 +69,12 @@ export class GatewayManager implements Manager {
         msg.sequence = json.s;
         msg.eventName = json.t;
         msg.data = json.d;
-        this.logger.debug("[Gateway] -> " + JSON.stringify(msg));
+        let logJson: string = JSON.stringify(msg);
+        if (logJson.length >= 60) {
+            logJson = logJson.substring(0, 60);
+            logJson += "...";
+        }
+        this.logger.debug("[Gateway] -> " + logJson);
         this.process(msg);
     }
 
@@ -91,6 +98,7 @@ export class GatewayManager implements Manager {
                         $device: "disnet"
                     }
                 };
+                this.identified = true;
                 this.send(identify);
             }
             this.ping();
@@ -104,6 +112,21 @@ export class GatewayManager implements Manager {
             heartbeat.opcode = GatewayOpcode.HEARTBEAT;
             this.send(heartbeat);
         }, this.heartbeatInterval);
+    }
+
+    private lifecycle(): void {
+        setTimeout(() => {
+            if (this.webSocket !== undefined && this.webSocket.readyState === WebSocket.OPEN) {
+                this.lifecycle();
+            } else {
+                this.logger.err("Can't find any life for the websocket");
+                if (this.webSocket !== undefined) {
+                    this.logger.err("[WebSocket] Ready State: " + this.webSocket.readyState);
+                }
+                console.log("Auto exiting...");
+                process.exit(0);
+            }
+        }, 2500);
     }
 
 }
@@ -130,7 +153,7 @@ export class GatewayMessage {
 
     public encode(): any {
         return {
-            d: this.data,
+            d: this.data === undefined ? "{}" : this.data,
             op: this.opcode,
             s: this.sequence,
             t: this.eventName
