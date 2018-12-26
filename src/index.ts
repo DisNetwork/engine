@@ -31,3 +31,9 @@ export * from './manager';
 
 // Export everything from the logger
 export * from './logger';
+
+// Export everything from the cloud
+export * from './cloud';
+
+// Export everything from the cloud/database
+export * from "./cloud/database";
