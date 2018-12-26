@@ -107,6 +107,11 @@ export class GatewayManager implements Manager {
                 this.send(identify);
             }
             this.ping();
+        } else if (message.opcode === GatewayOpcode.DISPATCH) {
+            if (message.eventName === GatewayEvent.READY) {
+                const version: number = message.data.v;
+                this.logger.debug("Ready! Gateway version " + version);
+            }
         }
 
     }
@@ -148,6 +153,37 @@ export enum GatewayOpcode {
     INVAILD_SESSION = 9,
     HELLO = 10,
     HEARTBEAT_ACK = 11
+}
+
+export enum GatewayEvent {
+    READY = "READY",
+    RESUMED = "RESUMED",
+    CHANNEL_CREATE = "CHANNEL_CREATE",
+    CHANNEL_UPADTE = "CHANNEL_UPDATE",
+    CHANNEL_DELETE = "CHANNEL_DELETE",
+    CHANNEL_PINS_UPDATE = "CHANNEL_PINS_UPDATE",
+    GUILD_CREATE = "GUILD_CREATE",
+    GUILD_UPADTE = "GUILD_UPDATE",
+    GUILD_DELETE = "GUILD_DELETE",
+    GUILD_BAN_ADD = "GUILD_BAN_ADD",
+    GUILD_BAN_REMOVE = "GUILD_BAN_REMOVED",
+    GUILD_EMOJIS_UPDATE = "GUILD_EMOJIS_UPDATE",
+    GUILD_INTERGRATIONS_UPDATE = "GUILD_INTERGRATIONS_UPDATE",
+    GUILD_MEMBER_ADD = "GUILD_MEMBER_ADD",
+    GUILD_MEMBER_REMOVE = "GUILD_MEMBER_REMOVE",
+    GUILD_MEMBER_UPDATE = "GUILD_MEMBER_UPDATE",
+    GUILD_MEMBER_CHUNK = "GUILD_MEMBER_CHUNK",
+    GUILD_ROLE_CREATE = "GUILD_ROLE_CREATE",
+    GUILD_ROLE_UPDATE = "GUILD_ROLE_UPDATE",
+    GUILD_ROLE_DELETE = "GUILD_ROLE_DELETE",
+    MESSAGE_CREATE = "MESSAGE_CREATE",
+    MESSAGE_UPDATE = "MESSAGE_UPDATE",
+    MESSAGE_DELETE = "MESSAGE_DELETE",
+    MESSAGE_DELETE_BULK = "MESSAGE_DELETE_BULK",
+    MESSAGE_REACTION_ADD = "MESSAGE_REACTION_ADD",
+    MESSAGE_REACTION_REMOVE = "MESSAGE_REACTION_REMOVE",
+    MESSAGE_REACTION_REMOVE_ALL = "MESSAGE_REACTION_REMOVE_ALL",
+    PRESENCE_UPDATE = "PRESENCE_UPDATE"
 }
 
 export class GatewayMessage {
