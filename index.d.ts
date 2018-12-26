@@ -102,3 +102,29 @@ export declare namespace CloudDatabase {
         has(id: SnowFlake): boolean;
     }
 }
+
+/**
+ * Deal with cloud customiztions
+ */
+export declare interface CloudEngine {
+
+    /**
+     * Name of the cloud engine
+     */
+    name: string;
+
+    /**
+     * Deal with guilds in the cloud
+     */
+    guilds: CloudDatabase.Guilds;
+
+    /**
+     * Deal with channels in the cloud
+     */
+    channels: CloudDatabase.Channels;
+
+    /**
+     * Deal with users in the cloud
+     */
+    users: CloudDatabase.Users;
+}
