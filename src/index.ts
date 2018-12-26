@@ -1,3 +1,4 @@
+import { CoreGuilds } from './core/guild';
 import { CloudEngine } from './cloud';
 import { LoggerLevel, Logger } from './logger';
 import { Manager } from './manager';
@@ -9,6 +10,7 @@ export class BotExecutor {
     private logger: Logger;
     private manager: Manager | GatewayManager | undefined;
     private _cloud: CloudEngine | undefined;
+    private _coreGuilds: CoreGuilds | undefined;
 
     public constructor(
         token: string,
@@ -23,15 +25,23 @@ export class BotExecutor {
         this.logger = new Logger(logLevel, "[DisNetwork] [LOG] ");
         if (cloud) {
             this._cloud = cloud;
+        } else {
+            this.logger.warn("[Engine] No cloud engine found");
+            this.logger.warn("[Engine] Running on local mode!");
+            this._coreGuilds = new CoreGuilds();
         }
         if (type === BotExecuteType.GATEWAY) {
-            this.manager = new GatewayManager(this.token, this.logger);
+            this.manager = new GatewayManager(this, this.token, this.logger);
             this.manager.execute();
         }
     }
 
     get cloud(): CloudEngine | undefined {
         return this._cloud;
+    }
+
+    get coreGuilds(): CoreGuilds | undefined {
+        return this._coreGuilds;
     }
 
 }
@@ -48,6 +58,8 @@ export * from './logger';
 
 // Export everything from the cloud
 export * from './cloud';
-
-// Export everything from the cloud/database
 export * from "./cloud/database";
+
+// Export everything from the core
+export * from "./core";
+export * from "./core/guild";
