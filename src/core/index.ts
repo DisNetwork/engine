@@ -18,4 +18,11 @@ export class CoreSnowFlake implements SnowFlake {
     public constructor(id: number) {
         this.id = id;
     }
+
+    public toString = (): string => {
+        return "" + this.id;
+    }
 }
+
+// Export everything from guild.ts
+export * from "./guild";
