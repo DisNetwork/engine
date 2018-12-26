@@ -1,4 +1,4 @@
-import { SnowFlake } from '@disnetwork/core';
+import { SnowFlake, Guilds, Guild } from '@disnetwork/core';
 
 /**
  * Executes the bot ( You can create only one instance )
@@ -127,4 +127,65 @@ export declare interface CloudEngine {
      * Deal with users in the cloud
      */
     users: CloudDatabase.Users;
+}
+
+/**
+ * Convert from string to SnowFlake
+ */
+export declare class SnowFlakeConvertor {
+
+    public static fromString(id: string): SnowFlake;
+}
+
+/**
+ * Overrided core snowflake
+ */
+export declare class CoreSnowFlake implements SnowFlake {
+
+    /**
+     * The id of the snowflake
+     */
+    public readonly id: number;
+}
+
+/**
+ * Deal with the guild
+ */
+export declare class CoreGuild implements Guild {
+
+    /**
+     * SnowFlake ID of the guild
+     */
+    public id: SnowFlake;
+
+    /**
+     * Name of the guild
+     */
+    public name: string;
+
+    /**
+     * Icon url of the guild
+     */
+    public icon?: string;
+
+    /**
+     * Owner SnowFlake ID of the guild
+     */
+    public ownerId: SnowFlake;
+}
+
+/**
+ * Deal with the guilds of the bot
+ */
+export declare class CoreGuilds implements Guilds {
+
+    /**
+     * Get the guild that the bot is apart of it
+     */
+    public get(id: SnowFlake): CoreGuild;
+
+    /**
+     * Check if the bot is in that guild or not
+     */
+    public has(id: SnowFlake): boolean;
 }
