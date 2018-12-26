@@ -1,3 +1,5 @@
+import { SnowFlake } from '@disnetwork/core';
+
 /**
  * Executes the bot ( You can create only one instance )
  */
@@ -69,4 +71,60 @@ export declare enum LoggerLevel {
     INFO = 2,
     DEBUG = 3,
     OFF = 4
+}
+
+/**
+ * Deal with the database of the cloud
+ */
+export declare namespace CloudDatabase {
+
+    /**
+     * Deal with guilds in the cloud
+     */
+    export interface Guilds {
+        get(id: SnowFlake): any;
+        has(id: SnowFlake): boolean;
+    }
+
+    /**
+     * Deal with channels in the cloud
+     */
+    export interface Channels {
+        get(id: SnowFlake): any;
+        has(id: SnowFlake): boolean;
+    }
+
+    /**
+     * Deal with users in the cloud
+     */
+    export interface Users {
+        get(id: SnowFlake): any;
+        has(id: SnowFlake): boolean;
+    }
+}
+
+/**
+ * Deal with cloud customiztions
+ */
+export declare interface CloudEngine {
+
+    /**
+     * Name of the cloud engine
+     */
+    name: string;
+
+    /**
+     * Deal with guilds in the cloud
+     */
+    guilds: CloudDatabase.Guilds;
+
+    /**
+     * Deal with channels in the cloud
+     */
+    channels: CloudDatabase.Channels;
+
+    /**
+     * Deal with users in the cloud
+     */
+    users: CloudDatabase.Users;
 }

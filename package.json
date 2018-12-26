@@ -23,7 +23,7 @@
     },
     "homepage": "https://github.com/DisNetwork/engine#readme",
     "dependencies": {
-        "@disnetwork/core": "0.0.13",
+        "@disnetwork/core": "0.0.2",
         "request": "^2.88.0",
         "ws": "^6.1.2"
     },

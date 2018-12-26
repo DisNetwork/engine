@@ -12,7 +12,9 @@
         "no-console": false,
         "no-trailing-whitespace": true,
         "ordered-imports": false,
-        "object-literal-sort-keys": false
+        "object-literal-sort-keys": false,
+        "no-namespace": false,
+        "variable-name": false
     },
     "rulesDirectory": []
 }
