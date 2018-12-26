@@ -52,7 +52,12 @@ export class GatewayManager implements Manager {
     private send(message: GatewayMessage) {
         if (this.webSocket) {
             const json: string = JSON.stringify(message.encode());
-            this.logger.debug("[Gateway] <- " + json);
+            let logJson: string = json;
+            if (logJson.length > 60) {
+                logJson = json.substring(0, 60);
+                logJson += "...";
+            }
+            this.logger.debug("[Gateway] <- " + logJson);
             this.webSocket.send(json);
         }
     }
