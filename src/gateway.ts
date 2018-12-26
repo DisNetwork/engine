@@ -147,9 +147,9 @@ export enum GatewayOpcode {
     IDENTIFY = 2,
     STATUS_UPDATE = 3,
     VOICE_STATE_UPDATE = 4,
-    RESUME = 5,
-    RECONNECT = 6,
-    REQUEST_GUILD_MEMBERS = 7,
+    RESUME = 6,
+    RECONNECT = 7,
+    REQUEST_GUILD_MEMBERS = 8,
     INVAILD_SESSION = 9,
     HELLO = 10,
     HEARTBEAT_ACK = 11
