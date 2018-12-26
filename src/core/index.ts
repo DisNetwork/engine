@@ -1,13 +1,5 @@
 import { SnowFlake } from "@disnetwork/core";
 
-export class CoreSnowFlake implements SnowFlake {
-    public readonly id: number;
-
-    public constructor(id: number) {
-        this.id = id;
-    }
-}
-
 export class SnowFlakeConvertor {
 
     public static fromString(id: string): SnowFlake {
@@ -16,4 +8,14 @@ export class SnowFlakeConvertor {
         return snowFlake;
     }
 
+}
+
+export class CoreSnowFlake implements SnowFlake {
+    public static readonly EMPTY: SnowFlake = SnowFlakeConvertor.fromString('0');
+
+    public readonly id: number;
+
+    public constructor(id: number) {
+        this.id = id;
+    }
 }
