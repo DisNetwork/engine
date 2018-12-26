@@ -8,7 +8,7 @@ export class Logger {
     }
 
     public print(level: LoggerLevel, message: string): void {
-        if (level >= this.level) {
+        if (level <= this.level) {
             console.log(`${this.prefix}${message}`);
         }
     }
@@ -32,9 +32,9 @@ export class Logger {
 }
 
 export enum LoggerLevel {
-    ERR = 0,
-    WARN = 1,
-    INFO = 2,
-    DEBUG = 3,
-    OFF = 4
+    OFF = 5,
+    DEBUG = 4,
+    INFO = 3,
+    WARN = 2,
+    ERR = 1
 }

@@ -1,8 +1,13 @@
+import { CloudEngine } from './cloud/index';
 import { Logger } from './logger';
 import { Manager } from './manager';
 import { get, CoreOptions, Response } from 'request';
 import { DiscordAPI } from './discord';
 import WebSocket = require('ws');
+import { SnowFlake } from '@disnetwork/core';
+import { SnowFlakeConvertor } from './core';
+import { BotExecutor } from '.';
+import { CoreGuild, CoreGuilds } from './core/guild';
 
 export class GatewayManager implements Manager {
     private url: string | undefined;
@@ -10,7 +15,7 @@ export class GatewayManager implements Manager {
     private heartbeatInterval: number | undefined;
     private identified: boolean = false;
 
-    public constructor(private token: string, private logger: Logger) {
+    public constructor(private executor: BotExecutor, private token: string, private logger: Logger) {
     }
 
     public execute(): void {
@@ -111,6 +116,28 @@ export class GatewayManager implements Manager {
             if (message.eventName === GatewayEvent.READY) {
                 const version: number = message.data.v;
                 this.logger.debug("Ready! Gateway version " + version);
+            } else if (message.eventName === GatewayEvent.GUILD_CREATE) {
+                const id: SnowFlake = SnowFlakeConvertor.fromString(message.data.id);
+                const name: string = message.data.name;
+                const icon: string = message.data.icon;
+                const ownerId: SnowFlake = SnowFlakeConvertor.fromString(message.data.owner_id);
+                const guild: CoreGuild = new CoreGuild(id, name, ownerId);
+                guild.icon = icon;
+                this.logger.debug("[Gateway] [Guild-Create] -> Id: #" + id + " | name: " + name);
+                // Cache the bot when there's no cloud support on running this engine
+                const cloudEngine: CloudEngine | undefined = this.executor.cloud;
+                if (cloudEngine === undefined) {
+                    if (this.executor.coreGuilds !== undefined) {
+                        const coreGuilds: CoreGuilds = this.executor.coreGuilds;
+                        if (!coreGuilds.has(id)) {
+                            coreGuilds.add(guild);
+                        }
+                    }
+                } else { // Executing the services throw the cloud service
+                    if (!cloudEngine.guilds.has(id)) {
+                        cloudEngine.guilds.add(guild);
+                    }
+                }
             }
         }
 
