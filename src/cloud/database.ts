@@ -12,4 +12,9 @@ export namespace CloudDatabase {
         has(id: SnowFlake): boolean;
     }
 
+    export interface Users {
+        get(id: SnowFlake): any;
+        has(id: SnowFlake): boolean;
+    }
+
 }
