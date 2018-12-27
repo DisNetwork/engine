@@ -146,14 +146,15 @@ export class GatewayManager implements Manager {
                     for (const key in channel) {
                         (newChannel as any)[key] = (channel as any)[key];
                     }
+                    newChannel.guild_id = guild.id;
                     if (cloudEngine === undefined) {
                         const coreChannels: CoreChannels | undefined = this.executor.coreChannels;
                         if (coreChannels !== undefined) {
-                            coreChannels.add(channel);
+                            coreChannels.add(newChannel);
                         }
                     } else {
                         if (!cloudEngine.channels.has(id)) {
-                            cloudEngine.channels.add(channel);
+                            cloudEngine.channels.add(newChannel);
                         }
                     }
                 }
