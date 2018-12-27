@@ -1,4 +1,5 @@
 import { CloudEngine } from './cloud/index';
+import { CoreGuild, CoreGuilds } from './core/guild';
 import { Logger } from './logger';
 import { Manager } from './manager';
 import { get, CoreOptions, Response } from 'request';
@@ -7,7 +8,7 @@ import WebSocket = require('ws');
 import { SnowFlake } from '@disnetwork/core';
 import { SnowFlakeConvertor } from './core';
 import { BotExecutor } from '.';
-import { CoreGuild, CoreGuilds } from './core/guild';
+import { CoreChannel } from './core/channel';
 
 export class GatewayManager implements Manager {
     private url: string | undefined;
@@ -122,6 +123,16 @@ export class GatewayManager implements Manager {
                 const icon: string = message.data.icon;
                 const ownerId: SnowFlake = SnowFlakeConvertor.fromString(message.data.owner_id);
                 const guild: CoreGuild = new CoreGuild(id, name, ownerId);
+                const channels: CoreChannel[] = message.data.channels;
+                for (let index = 0; index < channels.length; index++) {
+                    const channel = channels[index];
+                    const newChannel = new CoreChannel(channel.id, channel.type);
+                    for (const key in channel) {
+                        (newChannel as any)[key] = (channel as any)[key];
+                    }
+                    channels[index] = newChannel;
+                    this.logger.debug("[Gateway] [Channel-Create] -> Id: " + newChannel.id + " | name: " + newChannel.name);
+                }
                 guild.icon = icon;
                 this.logger.debug("[Gateway] [Guild-Create] -> Id: #" + id + " | name: " + name);
                 // Cache the bot when there's no cloud support on running this engine
