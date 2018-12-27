@@ -260,7 +260,7 @@ export declare class CoreChannel implements Channel {
  * Deal with channels in the bot
  */
 export declare class CoreChannels {
-    
+
     /**
      * Get the channel of the bot
      */
