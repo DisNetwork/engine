@@ -3,6 +3,7 @@ import { CloudEngine } from './cloud';
 import { LoggerLevel, Logger } from './logger';
 import { Manager } from './manager';
 import { GatewayManager } from './gateway';
+import { CoreChannels } from './core/channel';
 
 export class BotExecutor {
     private static instance: BotExecutor;
@@ -11,6 +12,7 @@ export class BotExecutor {
     private manager: Manager | GatewayManager | undefined;
     private _cloud: CloudEngine | undefined;
     private _coreGuilds: CoreGuilds | undefined;
+    private _coreChannels: CoreChannels | undefined;
 
     public constructor(
         token: string,
@@ -29,6 +31,7 @@ export class BotExecutor {
             this.logger.warn("[Engine] No cloud engine found");
             this.logger.warn("[Engine] Running on local mode!");
             this._coreGuilds = new CoreGuilds();
+            this._coreChannels = new CoreChannels();
         }
         if (type === BotExecuteType.GATEWAY) {
             this.manager = new GatewayManager(this, this.token, this.logger);
@@ -42,6 +45,10 @@ export class BotExecutor {
 
     get coreGuilds(): CoreGuilds | undefined {
         return this._coreGuilds;
+    }
+
+    get coreChannels(): CoreChannels | undefined {
+        return this._coreChannels;
     }
 
 }
