@@ -204,7 +204,7 @@ export declare class CoreChannel implements Channel {
      * Type of the channel
      */
     public type: ChannelType;
-    
+
     /**
      * Guild id of the channel
      */
