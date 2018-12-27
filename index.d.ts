@@ -1,4 +1,4 @@
-import { SnowFlake, Guilds, Guild } from '@disnetwork/core';
+import { SnowFlake, Guilds, Guild, Channel, ChannelType } from '@disnetwork/core';
 
 /**
  * Executes the bot ( You can create only one instance )
@@ -186,6 +186,88 @@ export declare class CoreGuilds implements Guilds {
 
     /**
      * Check if the bot is in that guild or not
+     */
+    public has(id: SnowFlake): boolean;
+}
+
+/**
+ * Deal with channel
+ */
+export declare class CoreChannel implements Channel {
+
+    /**
+     * Id of the channel
+     */
+    public id: SnowFlake;
+
+    /**
+     * Type of the channel
+     */
+    public type: ChannelType;
+
+    /**
+     * Guild id of the channel
+     */
+    public guild_id: SnowFlake | undefined;
+
+    /**
+     * Position of the channel
+     */
+    public position: number;
+
+    /**
+     * Name of the channel
+     */
+    public name: string | undefined;
+
+    /**
+     * Topic of the channel
+     */
+    public topic: string;
+
+    /**
+     * Nsfw of the channel
+     */
+    public nsfw: boolean;
+
+    /**
+     * Last message Id of the channel
+     */
+    public last_message_id: SnowFlake | undefined;
+
+    /**
+     * Bitrate of the channel
+     */
+    public bitrate: number | undefined;
+
+    /**
+     * User limit of the channel
+     */
+    public user_limit: number | undefined;
+
+    /**
+     * Rate limit per user
+     */
+    public rate_limit_per_user: number | undefined;
+
+    /**
+     * Parent id of the channel
+     */
+    public parent_id: SnowFlake | undefined;
+}
+
+/**
+ * Deal with channels in the bot
+ */
+export declare class CoreChannels {
+
+    /**
+     * Get the channel of the bot
+     */
+    public get(id: SnowFlake): CoreChannel;
+
+    /**
+     * Check if the bot is here
      */
     public has(id: SnowFlake): boolean;
 }

@@ -26,9 +26,6 @@ export class CoreGuilds implements Guilds {
     }
 
     public add(guild: CoreGuild): void {
-        if (this.has(guild.id)) {
-            return;
-        }
         this.guilds.set(guild.id, guild);
     }
 

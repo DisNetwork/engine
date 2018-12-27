@@ -1,4 +1,5 @@
 import { CloudEngine } from './cloud/index';
+import { CoreGuild, CoreGuilds } from './core/guild';
 import { Logger } from './logger';
 import { Manager } from './manager';
 import { get, CoreOptions, Response } from 'request';
@@ -7,7 +8,7 @@ import WebSocket = require('ws');
 import { SnowFlake } from '@disnetwork/core';
 import { SnowFlakeConvertor } from './core';
 import { BotExecutor } from '.';
-import { CoreGuild, CoreGuilds } from './core/guild';
+import { CoreChannel, CoreChannels } from './core/channel';
 
 export class GatewayManager implements Manager {
     private url: string | undefined;
@@ -123,7 +124,6 @@ export class GatewayManager implements Manager {
                 const ownerId: SnowFlake = SnowFlakeConvertor.fromString(message.data.owner_id);
                 const guild: CoreGuild = new CoreGuild(id, name, ownerId);
                 guild.icon = icon;
-                this.logger.debug("[Gateway] [Guild-Create] -> Id: #" + id + " | name: " + name);
                 // Cache the bot when there's no cloud support on running this engine
                 const cloudEngine: CloudEngine | undefined = this.executor.cloud;
                 if (cloudEngine === undefined) {
@@ -136,6 +136,26 @@ export class GatewayManager implements Manager {
                 } else { // Executing the services throw the cloud service
                     if (!cloudEngine.guilds.has(id)) {
                         cloudEngine.guilds.add(guild);
+                    }
+                }
+                const channels: CoreChannel[] = message.data.channels;
+                // Cache the channels if we are running locally
+                for (let index = 0; index < channels.length; index++) {
+                    const channel = channels[index];
+                    const newChannel = new CoreChannel(channel.id, channel.type);
+                    for (const key in channel) {
+                        (newChannel as any)[key] = (channel as any)[key];
+                    }
+                    newChannel.guild_id = guild.id;
+                    if (cloudEngine === undefined) {
+                        const coreChannels: CoreChannels | undefined = this.executor.coreChannels;
+                        if (coreChannels !== undefined) {
+                            coreChannels.add(newChannel);
+                        }
+                    } else {
+                        if (!cloudEngine.channels.has(id)) {
+                            cloudEngine.channels.add(newChannel);
+                        }
                     }
                 }
             }
