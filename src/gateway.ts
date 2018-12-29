@@ -5,18 +5,30 @@ import { Manager } from './manager';
 import { get, CoreOptions, Response } from 'request';
 import { DiscordAPI } from './discord';
 import WebSocket = require('ws');
-import { SnowFlake } from '@disnetwork/core';
+import { SnowFlake, Guild } from '@disnetwork/core';
 import { SnowFlakeConvertor } from './core';
 import { BotExecutor } from '.';
 import { CoreChannel, CoreChannels } from './core/channel';
+
+class GuildUnavailable {
+    public id: SnowFlake;
+    public unavailable: boolean;
+
+    public constructor(id: SnowFlake, unavailable: boolean) {
+        this.id = id;
+        this.unavailable = unavailable;
+    }
+}
 
 export class GatewayManager implements Manager {
     private url: string | undefined;
     private webSocket: WebSocket | undefined;
     private heartbeatInterval: number | undefined;
     private identified: boolean = false;
+    private guilds: Map<number, GuildUnavailable>;
 
     public constructor(private executor: BotExecutor, private token: string, private logger: Logger) {
+        this.guilds = new Map();
     }
 
     public execute(): void {
@@ -116,8 +128,19 @@ export class GatewayManager implements Manager {
         } else if (message.opcode === GatewayOpcode.DISPATCH) {
             if (message.eventName === GatewayEvent.READY) {
                 const version: number = message.data.v;
+                const guilds: GuildUnavailable[] = message.data.guilds;
+                for (const guild of guilds) {
+                    const snowflakeId: SnowFlake = SnowFlakeConvertor.fromString("" + guild.id);
+                    const typedGuild = new GuildUnavailable(snowflakeId, guild.unavailable);
+                    this.guilds.set(typedGuild.id.id, typedGuild);
+                }
                 this.logger.debug("Ready! Gateway version " + version);
             } else if (message.eventName === GatewayEvent.GUILD_CREATE) {
+                // Guild create fires when
+                // 1 - Bot joins a guild
+                // 2 - Guild loads during the ready event
+                // 3 - Guild loads after it became to be available
+                //
                 const id: SnowFlake = SnowFlakeConvertor.fromString(message.data.id);
                 const name: string = message.data.name;
                 const icon: string = message.data.icon;
@@ -157,6 +180,16 @@ export class GatewayManager implements Manager {
                             cloudEngine.channels.add(newChannel);
                         }
                     }
+                }
+
+                // Check if this event fired due to load or join
+                const guildUnavailable: GuildUnavailable | undefined = this.guilds.get(id.id);
+                if (guildUnavailable !== undefined && guildUnavailable.unavailable) {
+                    guildUnavailable.unavailable = false;
+                    this.guilds.set(guildUnavailable.id.id, guildUnavailable);
+                    // TODO load execute
+                } else {
+                    // TODO join execute
                 }
             }
         }
