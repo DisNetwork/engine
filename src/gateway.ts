@@ -126,7 +126,7 @@ export class GatewayManager implements Manager {
             }
             this.ping();
         } else if (message.opcode === GatewayOpcode.DISPATCH) {
-            if (message.eventName === GatewayEvent.READY) {
+            if (message.eventName === GatewayEvent.READY) { // Ready event
                 const version: number = message.data.v;
                 const guilds: GuildUnavailable[] = message.data.guilds;
                 for (const guild of guilds) {
@@ -135,7 +135,7 @@ export class GatewayManager implements Manager {
                     this.guilds.set(typedGuild.id.id, typedGuild);
                 }
                 this.logger.debug("Ready! Gateway version " + version);
-            } else if (message.eventName === GatewayEvent.GUILD_CREATE) {
+            } else if (message.eventName === GatewayEvent.GUILD_CREATE) { // Guild Join/Load event
                 // Guild create fires when
                 // 1 - Bot joins a guild
                 // 2 - Guild loads during the ready event
@@ -191,6 +191,58 @@ export class GatewayManager implements Manager {
                 } else {
                     // TODO join execute
                 }
+            } else if (message.eventName === GatewayEvent.GUILD_UPADTE) { // When anything in the guild updated`
+                // TODO update execute
+            } else if (message.eventName === GatewayEvent.GUILD_DELETE) { // When delete guild
+                // TODO delete execute
+            } else if (message.eventName === GatewayEvent.GUILD_BAN_ADD) { // When someone banned
+                // TODO ban add execute
+            } else if (message.eventName === GatewayEvent.GUILD_BAN_REMOVE) { // When someone unbanned
+                // TODO ban remove execute
+            } else if (message.eventName === GatewayEvent.GUILD_EMOJIS_UPDATE) { // When guild updates the emoji
+                // TODO emojis update execute
+            } else if (message.eventName === GatewayEvent.GUILD_INTERGRATIONS_UPDATE) { // When integrations update
+                // TODO integrations update execute
+            } else if (message.eventName === GatewayEvent.GUILD_MEMBER_ADD) { // When member add
+                // TODO member add execute
+            } else if (message.eventName === GatewayEvent.GUILD_MEMBER_REMOVE) { // When member removes
+                // TODO member remove execute
+            } else if (message.eventName === GatewayEvent.GUILD_MEMBER_UPDATE) { // When member updates
+                // TODO member update execute
+            } else if (message.eventName === GatewayEvent.GUILD_MEMBER_CHUNK) { // When member chunk
+                // TODO member chunk execute
+            } else if (message.eventName === GatewayEvent.GUILD_ROLE_CREATE) { // When guild role add
+                // TODO guild role add execute
+            } else if (message.eventName === GatewayEvent.GUILD_ROLE_UPDATE) { // When guild role update
+                // TODO guild role update execute
+            } else if (message.eventName === GatewayEvent.GUILD_ROLE_DELETE) { // When guild role delete
+                // TODO guild role delete execute
+            } else if (message.eventName === GatewayEvent.MESSAGE_CREATE) { // When message create
+                // TODO message create execute
+            } else if (message.eventName === GatewayEvent.MESSAGE_UPDATE) { // When message update
+                // TODO message update execute
+            } else if (message.eventName === GatewayEvent.MESSAGE_DELETE) { // When message delete
+                // TODO message delete execute
+            } else if (message.eventName === GatewayEvent.MESSAGE_DELETE_BULK) { // When message delete bulk
+                // TODO message delete bulk execute
+            } else if (message.eventName === GatewayEvent.MESSAGE_REACTION_ADD) { // When message reaction added
+                // TODO message reaction add execute
+            } else if (message.eventName === GatewayEvent.MESSAGE_REACTION_REMOVE) { // When message reaction remove
+                // TODO message reaction remove execute
+            } else if (message.eventName === GatewayEvent.MESSAGE_REACTION_REMOVE_ALL) {
+                // TODO message reaction remove all execute
+            } else if (message.eventName === GatewayEvent.PRESENCE_UPDATE) { // When presence update
+                // TODO presence update execute
+            } else if (message.eventName === GatewayEvent.TYPING_START) { // When typing start
+                // TODO typing start execute
+            } else if (message.eventName === GatewayEvent.USER_UPDATE) { // When user update
+                // TODO user update execute
+            } else if (message.eventName === GatewayEvent.VOICE_STATE_UPDATE) { // when voice state update
+                // TODO voice state update execute
+            } else if (message.eventName === GatewayEvent.VOICE_SERVER_UPDATE) { // when voice server update
+                // TODO voice server update execute
+            } else if (message.eventName === GatewayEvent.WEBHOOKS_UPDATE) { // When webhook update
+                // TODO webhooks update execute
             }
         }
 
@@ -263,7 +315,12 @@ export enum GatewayEvent {
     MESSAGE_REACTION_ADD = "MESSAGE_REACTION_ADD",
     MESSAGE_REACTION_REMOVE = "MESSAGE_REACTION_REMOVE",
     MESSAGE_REACTION_REMOVE_ALL = "MESSAGE_REACTION_REMOVE_ALL",
-    PRESENCE_UPDATE = "PRESENCE_UPDATE"
+    PRESENCE_UPDATE = "PRESENCE_UPDATE",
+    TYPING_START = "TYPING_START",
+    USER_UPDATE = "USER_UPDATE",
+    VOICE_STATE_UPDATE = "VOICE_STATE_UPDATE",
+    VOICE_SERVER_UPDATE = "VOICE_SERVER_UPDATE",
+    WEBHOOKS_UPDATE = "WEBHOOKS_UPDATE"
 }
 
 export class GatewayMessage {
