@@ -3,6 +3,7 @@ import { textSync } from 'figlet';
 import { HTTPManager } from './http';
 import ora from 'ora';
 import { wait } from './until';
+import { ExecutorProtocol } from './protocol';
 const cliSpinners = require('cli-spinners');
 console.log(textSync('DisNetwork', {
     font: 'Standard',
@@ -15,12 +16,15 @@ console.log("DisNetwork Engine© | https://github.com/DisNetwork/engine");
 start();
 
 async function start() {
-    const spinner = ora({
-        spinner: cliSpinners.dots12,
-        text: 'Starting...'.yellow,
+    // Start the executor manager
+    const executorProtocol: ExecutorProtocol = new ExecutorProtocol();
+    const executorSpinner = ora({
+        spinner: cliSpinners.line,
+        color: 'yellow',
+        text: '> Executor Protocol'
     }).start();
-    await wait(1000);
-    // TODO Start the executor manager
+    await executorProtocol.start();
+    executorSpinner.succeed();
     // Start the http server
     const httpServer: HTTPManager = new HTTPManager();
     const httpSpinner = ora({
@@ -30,6 +34,5 @@ async function start() {
     }).start();
     await httpServer.start();
     httpSpinner.succeed();
-    spinner.text = "> " + "Engine is ready to use!".green;
-    spinner.succeed();
+    console.log("> ".yellow + "Engine is ready to use!".green);
 }

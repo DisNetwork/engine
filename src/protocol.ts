@@ -1,8 +1,8 @@
 import SocketIO from 'socket.io';
 
-class ExecutorProtocol {
+export class ExecutorProtocol {
     private server: SocketIO.Server;
-    private port: number = 2020;
+    private _port: number = 2020;
 
     public constructor() {
         this.server = SocketIO();
@@ -22,5 +22,9 @@ class ExecutorProtocol {
                 reject();
             }
         });
+    }
+
+    get port(): number {
+        return this._port;
     }
 }
