@@ -2,11 +2,10 @@ import express from 'express';
 
 export class HTTPManager {
     private app: express.Application;
-    private _port: number;
+    private _port: number = 2030;
 
     public constructor() {
         this.app = express();
-        this._port = 2030;
     }
 
     public async start(): Promise<any> {
