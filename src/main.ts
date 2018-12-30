@@ -11,7 +11,7 @@ console.log(textSync('DisNetwork', {
     verticalLayout: 'fitted'
 }));
 console.log("-------------------------------");
-console.log("DisNetwork Engine© | https://github.com/DisNetwork/engine");
+console.log("DisNetwork® Engine | https://github.com/DisNetwork/engine");
 
 start();
 
@@ -19,7 +19,7 @@ async function start() {
     // Start the executor manager
     const executorProtocol: ExecutorProtocol = new ExecutorProtocol();
     const executorSpinner = ora({
-        spinner: cliSpinners.line,
+        spinner: cliSpinners.dots12,
         color: 'yellow',
         text: '> Executor Protocol'
     }).start();
@@ -30,7 +30,7 @@ async function start() {
     const httpSpinner = ora({
         spinner: cliSpinners.line,
         color: 'yellow',
-        text: '> HTTP Server on port ' + httpServer.port
+        text: '> HTTP Server'
     }).start();
     await httpServer.start();
     httpSpinner.succeed();
