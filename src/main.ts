@@ -3,8 +3,8 @@ import 'colors';
 import { textSync } from 'figlet';
 import { HTTPManager } from './http';
 import ora from 'ora';
-import { wait } from './until';
 import { ExecutorProtocol } from './protocol';
+import { LoggerLevel } from './logger';
 const cliSpinners = require('cli-spinners');
 console.log(textSync('DisNetwork', {
     font: 'Standard',
@@ -17,7 +17,7 @@ console.log("DisNetwork® Engine | https://github.com/DisNetwork/engine");
 start();
 
 async function start() {
-    const executorManager: ExecutorManager = new ExecutorManager(undefined);
+    const executorManager: ExecutorManager = new ExecutorManager(undefined, LoggerLevel.INFO);
     if (executorManager.cloud === undefined) {
         console.log('[CloudEngine] No cloud engine found! The engine is going to use the local cache'.red);
     }
