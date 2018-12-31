@@ -5,7 +5,7 @@ import { Manager } from './manager';
 import { get, CoreOptions, Response } from 'request';
 import { DiscordAPI } from './discord';
 import WebSocket = require('ws');
-import { SnowFlake, Guild } from '@disnetwork/core';
+import { SnowFlake } from '@disnetwork/core';
 import { SnowFlakeConvertor } from './core';
 import { BotExecutor } from '.';
 import { CoreChannel, CoreChannels } from './core/channel';
