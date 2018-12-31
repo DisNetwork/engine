@@ -7,8 +7,6 @@ import { CoreChannels } from './core/channel';
 import { get, post, CoreOptions, Response } from 'request';
 
 export class BotExecutor {
-    public static readonly DISNETWORK_ENDPOINT: string = "disnetwork://";
-
     private static instance: BotExecutor;
     private appId: string;
     private token: string;
@@ -19,6 +17,7 @@ export class BotExecutor {
     private _coreChannels: CoreChannels | undefined;
 
     public constructor(
+        private endpoint: string,
         appId: string,
         token: string,
         type: BotExecuteType,
@@ -49,7 +48,7 @@ export class BotExecutor {
     }
 
     public fire(type: 'GET' | 'POST', path: string, payload: any): void {
-        const url: string = BotExecutor.DISNETWORK_ENDPOINT + path;
+        const url: string = this.endpoint + path;
         const options: CoreOptions = {
             headers: {
                 authorization: this.appId

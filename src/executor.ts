@@ -10,8 +10,9 @@ export class ExecutorManager {
     private map: Map<string, BotExecutor>;
 
     public constructor(
-        cloud: CloudEngine | undefined,
+        private endpoint: string,
         private logLevel: LoggerLevel,
+        cloud?: CloudEngine,
         apps?: any
     ) {
         this._cloud = cloud;
@@ -19,6 +20,9 @@ export class ExecutorManager {
         ExecutorManager.instance = this;
         if (apps !== undefined) {
             this.apps = apps;
+            for (const appId in apps) {
+                console.log('[Local Apps] '.cyan + 'Loaded! '.green + ("" + appId).reset);
+            }
         }
     }
 
@@ -32,7 +36,7 @@ export class ExecutorManager {
         } else {
             token = this.cloud.apps.get(appId);
         }
-        const executor: BotExecutor = new BotExecutor(appId, token, type, this.logLevel, this.cloud);
+        const executor: BotExecutor = new BotExecutor(this.endpoint, appId, token, type, this.logLevel, this.cloud);
         return executor;
     }
 
