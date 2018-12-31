@@ -1,5 +1,5 @@
 import express from 'express';
-import { MessageController } from './controller';
+import { MessageController, BotController } from './controller';
 
 export class HTTPManager {
     private app: express.Application;
@@ -8,6 +8,7 @@ export class HTTPManager {
     public constructor() {
         this.app = express();
         this.app.use('/message', MessageController);
+        this.app.use('/bot', BotController);
     }
 
     public async start(): Promise<any> {
