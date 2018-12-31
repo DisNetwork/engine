@@ -6,6 +6,7 @@ export interface CloudEngine {
     guilds: CloudDatabase.Guilds;
     channels: CloudDatabase.Channels;
     users: CloudDatabase.Users;
+    apps: CloudDatabase.Apps;
 }
 
 // Export everything from database

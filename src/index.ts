@@ -13,7 +13,7 @@ export class BotExecutor {
     private appId: string;
     private token: string;
     private logger: Logger;
-    private manager: Manager | GatewayManager | undefined;
+    private _manager: Manager | GatewayManager | undefined;
     private _cloud: CloudEngine | undefined;
     private _coreGuilds: CoreGuilds | undefined;
     private _coreChannels: CoreChannels | undefined;
@@ -38,7 +38,12 @@ export class BotExecutor {
             this._coreChannels = new CoreChannels();
         }
         if (type === BotExecuteType.GATEWAY) {
-            this.manager = new GatewayManager(this, this.token, this.logger);
+            this._manager = new GatewayManager(this, this.token, this.logger);
+        }
+    }
+
+    public execute(): void {
+        if (this.manager) {
             this.manager.execute();
         }
     }
@@ -47,7 +52,7 @@ export class BotExecutor {
         const url: string = BotExecutor.DISNETWORK_ENDPOINT + path;
         const options: CoreOptions = {
             headers: {
-                App: this.appId
+                authorization: this.appId
             }
         };
         this.logger.debug(`${type} -> ${path} [ ${this.appId} ]`);
@@ -76,6 +81,10 @@ export class BotExecutor {
 
     get coreChannels(): CoreChannels | undefined {
         return this._coreChannels;
+    }
+
+    get manager(): Manager | GatewayManager | undefined {
+        return this._manager;
     }
 
 }

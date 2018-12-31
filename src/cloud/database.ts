@@ -21,4 +21,9 @@ export namespace CloudDatabase {
         has(id: SnowFlake): boolean;
     }
 
+    export interface Apps {
+        get(id: string): string;
+        has(id: string): boolean;
+    }
+
 }
