@@ -32,8 +32,6 @@ async function start() {
     let endpoint: string = "http://localhost:2030";
     let httpPort: number = 2030;
     let executePort: number = 2020;
-    program.logLevel = LoggerLevel.DEBUG;
-    program.apps = true;
     if (program.logLevel) {
         loggerLevel = program.logLevel;
     }
