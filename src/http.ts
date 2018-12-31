@@ -1,4 +1,5 @@
 import express from 'express';
+import { MessageController } from './controller';
 
 export class HTTPManager {
     private app: express.Application;
@@ -6,6 +7,7 @@ export class HTTPManager {
 
     public constructor() {
         this.app = express();
+        this.app.use('/message', MessageController);
     }
 
     public async start(): Promise<any> {
