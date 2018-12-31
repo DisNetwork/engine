@@ -4,9 +4,13 @@ import { LoggerLevel, Logger } from './logger';
 import { Manager } from './manager';
 import { GatewayManager } from './gateway';
 import { CoreChannels } from './core/channel';
+import { get, post, CoreOptions, Response } from 'request';
 
 export class BotExecutor {
+    public static readonly DISNETWORK_ENDPOINT: string = "disnetwork://";
+
     private static instance: BotExecutor;
+    private appId: string;
     private token: string;
     private logger: Logger;
     private manager: Manager | GatewayManager | undefined;
@@ -15,6 +19,7 @@ export class BotExecutor {
     private _coreChannels: CoreChannels | undefined;
 
     public constructor(
+        appId: string,
         token: string,
         type: BotExecuteType,
         logLevel: LoggerLevel,
@@ -23,6 +28,7 @@ export class BotExecutor {
         if (BotExecutor.instance) {
             throw new Error("More then one instance for the bot executor");
         }
+        this.appId = appId;
         this.token = token;
         this.logger = new Logger(logLevel, "[DisNetwork] [LOG] ");
         if (cloud) {
@@ -37,6 +43,29 @@ export class BotExecutor {
             this.manager = new GatewayManager(this, this.token, this.logger);
             this.manager.execute();
         }
+    }
+
+    public fire(type: 'GET' | 'POST', path: string, payload: any): void {
+        const url: string = BotExecutor.DISNETWORK_ENDPOINT + path;
+        const options: CoreOptions = {
+            headers: {
+                App: this.appId
+            }
+        };
+        this.logger.debug(`${type} -> ${path} [ ${this.appId} ]`);
+        const callback: any = (error: any, res: Response, body: any) => {
+                if (error) {
+                    this.logger.err(`Error while firing [ ${type} ${path} ]: ` + error);
+                    return;
+                }
+                this.logger.debug(`${res.statusCode} <- ${type} ${path} [ ${this.appId} ]`);
+            };
+        if (type === 'GET') {
+            get(url, options, callback);
+        } else if (type === 'POST') {
+            post(url, options, callback);
+        }
+        return;
     }
 
     get cloud(): CloudEngine | undefined {
