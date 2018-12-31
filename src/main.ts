@@ -23,11 +23,15 @@ async function start() {
         .option('-l, --log-level <level>', 'Logger level type')
         .option('-a, --apps [file]', 'Enable the using of the local apps ( default: apps.json )')
         .option('-e, --endpoint <endpoint>', 'Change the endpoint of the engine ( default: http://localhost )')
+        .option('-hp, --http-port <port>', 'Specify the http port')
+        .option('-ep, --execute-port <port>', 'Specify the execute port of the executor protocol')
         .parse(process.argv);
     let loggerLevel: LoggerLevel = LoggerLevel.INFO;
     let apps: any;
     let appsFile: string = "./apps.json";
     let endpoint: string = "http://localhost:2030";
+    let httpPort: number = 2030;
+    let executePort: number = 2020;
     program.logLevel = LoggerLevel.DEBUG;
     program.apps = true;
     if (program.logLevel) {
@@ -42,12 +46,18 @@ async function start() {
     if (program.endpoint) {
         endpoint = program.endpoint;
     }
+    if (program.httpPort) {
+        httpPort = program.httpPort;
+    }
+    if (program.executePort) {
+        executePort = program.executePort;
+    }
     const executorManager: ExecutorManager = new ExecutorManager(endpoint, loggerLevel, undefined, apps);
     if (executorManager.cloud === undefined) {
         console.log('[CloudEngine] No cloud engine found! The engine is going to use the local cache'.red);
     }
     // Start the executor manager
-    const executorProtocol: ExecutorProtocol = new ExecutorProtocol();
+    const executorProtocol: ExecutorProtocol = new ExecutorProtocol(executePort);
     const executorSpinner = ora({
         spinner: cliSpinners.dots12,
         color: 'yellow',
@@ -56,7 +66,7 @@ async function start() {
     await executorProtocol.start();
     executorSpinner.succeed();
     // Start the http server
-    const httpServer: HTTPManager = new HTTPManager();
+    const httpServer: HTTPManager = new HTTPManager(httpPort);
     const httpSpinner = ora({
         spinner: cliSpinners.line,
         color: 'yellow',

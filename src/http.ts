@@ -3,9 +3,8 @@ import { MessageController, BotController } from './controller';
 
 export class HTTPManager {
     private app: express.Application;
-    private _port: number = 2030;
 
-    public constructor() {
+    public constructor(private _port: number) {
         this.app = express();
         this.app.use('/message', MessageController);
         this.app.use('/bot', BotController);

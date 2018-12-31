@@ -3,9 +3,8 @@ import SocketIO from 'socket.io';
 export class ExecutorProtocol {
     private server: SocketIO.Server;
     private socket: SocketIO.Socket | undefined;
-    private _port: number = 2020;
 
-    public constructor() {
+    public constructor(private _port: number) {
         this.server = SocketIO();
         this.server.on('connection', (socket) => {
             if (this.socket !== undefined) {
