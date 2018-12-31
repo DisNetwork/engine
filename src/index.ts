@@ -34,8 +34,6 @@ export class BotExecutor {
         if (cloud) {
             this._cloud = cloud;
         } else {
-            this.logger.warn("[Engine] No cloud engine found");
-            this.logger.warn("[Engine] Running on local mode!");
             this._coreGuilds = new CoreGuilds();
             this._coreChannels = new CoreChannels();
         }
