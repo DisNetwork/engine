@@ -1,4 +1,4 @@
-import { ExecutorManager } from './../executor';
+import { ExecutorManager } from './../protocol';
 import { Router, Request, Response } from 'express';
 import { BotExecutor } from '..';
 

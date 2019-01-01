@@ -4,6 +4,7 @@ const router: Router = Router();
 
 router.get('/create', (req: Request, res: Response) => {
     // TODO message create execute
+    console.log(req.body);
 });
 
 router.get('/update', (req: Request, res: Response) => {
