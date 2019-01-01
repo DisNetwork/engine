@@ -5,7 +5,7 @@
     "main": "index.js",
     "type": "index.d.ts",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "tsc -p . --sourceMap && node out/main -l 4 -a"
     },
     "repository": {
         "type": "git",
@@ -32,6 +32,7 @@
         "ora": "^3.0.0",
         "request": "^2.88.0",
         "socket.io": "^2.2.0",
+        "uuid": "^3.3.2",
         "ws": "^6.1.2"
     },
     "devDependencies": {
@@ -42,6 +43,7 @@
         "@types/ora": "^3.0.0",
         "@types/request": "^2.48.1",
         "@types/socket.io": "^2.1.2",
+        "@types/uuid": "^3.4.4",
         "@types/ws": "^6.0.1"
     }
 }
