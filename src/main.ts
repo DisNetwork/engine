@@ -21,20 +21,24 @@ async function start() {
         .version('0.0.2', '-v, --version')
         .option('-l, --log-level <level>', 'Logger level type')
         .option('-a, --apps [file]', 'Enable the using of the local apps ( default: apps.json )')
-        .option('-f, --executor-file <filename>', 'Set the executor path ( default: executor.js )')
+        .option('-f, --executor-file <filename>', 'Set the executor path ( default: out/executor.js )')
         .option('-e, --endpoint <endpoint>', 'Change the endpoint of the engine ( default: http://localhost )')
         .option('-h, --http-port <port>', 'Specify the http port')
         .option('-p, --execute-port <port>', 'Specify the execute port of the executor protocol')
         .option('-t, --executor-timeout <timeout>', 'Change the executor protocol timeout ( default: 20 seconds )')
+        .option('-o, --host <host>', 'Change the host ( default: localhost )')
+        .option('-d, --debug', 'Enable the debug mode for the executor protocol')
         .parse(process.argv);
     let loggerLevel: LoggerLevel = LoggerLevel.INFO;
     let apps: any;
     let appsFile: string = "./apps.json";
-    let executorFile: string = "executor.js";
+    let executorFile: string = "out/executor.js";
     let endpoint: string = "http://localhost:2030/";
+    let host: string = "localhost";
     let httpPort: number = 2030;
     let executePort: number = 2020;
     let executorTimeout: number = 20 * 1000;
+    let debug: boolean = false;
     if (program.logLevel) {
         loggerLevel = program.logLevel;
     }
@@ -59,6 +63,13 @@ async function start() {
     if (program.executorTimeout) {
         executorTimeout = program.executorTimeout;
     }
+    if (program.host) {
+        host = program.host;
+    }
+    if (program.debug) {
+        debug = program.debug;
+        console.log("Warning! ".yellow + "Executor protocol DEBUG mode is ".cyan + "ENABLED".green);
+    }
     // Start the http server
     const httpServer: HTTPManager = new HTTPManager(httpPort);
     const httpSpinner = ora({
@@ -69,7 +80,10 @@ async function start() {
     await httpServer.start();
     httpSpinner.succeed();
     // Start the executor manager
-    const executorProtocol: ExecutorProtocol = new ExecutorProtocol(executePort, executorTimeout);
+    const executorProtocol: ExecutorProtocol = new ExecutorProtocol(
+        executePort,
+        executorTimeout
+    );
     let executorSpinner = ora({
         spinner: cliSpinners.dots12,
         color: 'yellow',
@@ -80,8 +94,10 @@ async function start() {
     const executorManager: ExecutorManager =  new ExecutorManager(
         executorProtocol,
         executorFile,
+        host,
         endpoint,
         loggerLevel,
+        debug,
         undefined,
         apps
     );
@@ -92,13 +108,21 @@ async function start() {
         spinner: cliSpinners.dots12,
         color: 'yellow',
         text: '> Starting the executor...'
-    }).start();
+    });
+    if (!debug) {
+        executorSpinner.start();
+    }
     const success: boolean = await executorManager.run();
     if (!success) {
-        executorSpinner.warn();
+        if (!debug) {
+            executorSpinner.warn();
+        }
         process.exit(0);
         return;
     }
-    executorSpinner.succeed();
+    if (!debug) {
+        executorSpinner.text = "Executor Process";
+        executorSpinner.succeed();
+    }
     console.log("> ".yellow + "Engine is ready to use!".green);
 }

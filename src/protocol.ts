@@ -7,6 +7,7 @@ import { dirname } from 'path';
 import { ChildProcess, exec } from 'child_process';
 import { v1 } from 'uuid';
 import { wait } from './until';
+import path = require('path');
 
 export class ExecutorManager {
     public static instance: ExecutorManager;
@@ -19,8 +20,10 @@ export class ExecutorManager {
     public constructor(
         private protocol: ExecutorProtocol,
         private executorPath: string,
+        private host: string,
         private endpoint: string,
         private logLevel: LoggerLevel,
+        private debug: boolean,
         cloud?: CloudEngine,
         apps?: any
     ) {
@@ -51,12 +54,21 @@ export class ExecutorManager {
 
     public async run(): Promise<any> {
         return new Promise(async (resolve: any) => {
-            const path: string = dirname(this.executorPath) + "/" + this.executorPath;
+            const p: string = path.resolve(this.executorPath);
             const key: string = this.protocol.init();
-            this.process = exec('node ' + path + ` -p ${this.protocol.port} -k ${key}`);
+            if (!this.debug) {
+                const command: string = 'node "' + p + `" -h http://${this.host} -p ${this.protocol.port} -k ${key}`;
+                this.process = exec(command);
+            } else {
+                console.log('[DEBUG] '.yellow + "Host:".yellow + (" " + this.host).white);
+                console.log('[DEBUG] '.yellow + "Port:".yellow + (" " + this.protocol.port).white);
+                console.log('[DEBUG] '.yellow + "Key:".yellow + (" " + key).white);
+            }
             const opened: boolean = await this.protocol.open();
             if (!opened) {
-                this.process.kill();
+                if (this.process !== undefined) {
+                    this.process.kill();
+                }
             }
             this.process = undefined;
             resolve(opened);
@@ -104,13 +116,15 @@ export class ExecutorProtocol {
         this.server.on('connection', (socket) => {
             if (this.socket !== undefined) {
                 socket.disconnect(true);
+                return;
             }
             this.socket = socket;
-            socket.on('identity', this.onIdentity);
-            socket.on('ping', this.onPing);
-            socket.on('http', this.onHttp);
-            socket.on('start', this.onStart);
-            socket.on('stop', this.onStop);
+            socket.on('identity', (data) => this.onIdentity(data));
+            socket.on('ping', () => this.onPing());
+            socket.on('http', () => this.onHttp());
+            socket.on('start', () => this.onStart());
+            socket.on('stop', () => this.onStop());
+            socket.emit('connect');
         });
     }
 
