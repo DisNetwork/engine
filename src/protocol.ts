@@ -3,11 +3,26 @@ import SocketIO from 'socket.io';
 import { BotExecutor, BotExecuteType } from './index';
 import { CloudEngine } from './cloud/index';
 import { LoggerLevel } from './logger';
-import { dirname } from 'path';
 import { ChildProcess, exec } from 'child_process';
 import { v1 } from 'uuid';
 import { wait } from './until';
 import path = require('path');
+import { CoreOptions } from 'request';
+import { HTTPRequest } from './http';
+
+class ProcessData {
+    public id: string = "";
+    public started: number = new Date().getTime();
+    public stopped: number = new Date().getTime();
+    public outOfTimeout: boolean = false;
+    public code: number = 0;
+}
+
+enum HTTPCode {
+    DONE = 0,
+    URL_NOT_FOR_HTTP = -1,
+    REJECTED_HOSTNAME = -2
+}
 
 export class ExecutorManager {
     public static instance: ExecutorManager;
@@ -106,6 +121,7 @@ export class ExecutorProtocol {
     private timeout: number;
     private key: string | undefined;
     private connected: boolean = false;
+    private map: Map<string, (data: ProcessData) => void>;
 
     public constructor(
         private _port: number,
@@ -113,6 +129,7 @@ export class ExecutorProtocol {
     ) {
         this.timeout = this.default_timeout;
         this.server = SocketIO();
+        this.map = new Map();
         this.server.on('connection', (socket) => {
             if (this.socket !== undefined) {
                 socket.disconnect(true);
@@ -121,11 +138,25 @@ export class ExecutorProtocol {
             this.socket = socket;
             socket.on('identity', (data) => this.onIdentity(data));
             socket.on('ping', () => this.onPing());
-            socket.on('http', () => this.onHttp());
-            socket.on('start', () => this.onStart());
-            socket.on('stop', () => this.onStop());
+            socket.on('http', (data: any) => this.onHttp(data));
+            socket.on('stop', (data: ProcessData) => this.onStop(data));
             socket.emit('connect');
         });
+    }
+
+    public execute(id: string, p: string, timeout: number, listener: (data: ProcessData) => void) {
+        if (this.socket !== undefined) {
+            const data: any = {
+                id: undefined,
+                path: undefined,
+                timeout: undefined
+            };
+            data.id = id;
+            data.path = p;
+            data.timeout = timeout;
+            this.map.set(id, listener);
+            this.socket.emit('start', data);
+        }
     }
 
     public async start(): Promise<any> {
@@ -184,15 +215,45 @@ export class ExecutorProtocol {
         // TODO wait and send the ping
     }
 
-    private onHttp(): void {
-        // TODO vaild the request and do the request and do the response
+    private async onHttp(data: any) {
+        const id: string = data.id;
+        const type: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' = data.type;
+        const url: string = data.url;
+        if (!url.startsWith("http") && !url.startsWith("https")) {
+            if (this.socket !== undefined) {
+                this.socket.emit('http', {
+                    code: HTTPCode.URL_NOT_FOR_HTTP,
+                    id: id
+                });
+            }
+        } else if (!url.startsWith("https://discordapp.com")) {
+            if (this.socket !== undefined) {
+                this.socket.emit('http', {
+                    code: HTTPCode.REJECTED_HOSTNAME,
+                    id: id
+                });
+            }
+        }
+        const options: CoreOptions = data.options;
+        const request: HTTPRequest = await new HTTPRequest(type, url, 10000, options).send();
+        if (this.socket !== undefined) {
+            this.socket.emit('http', {
+                code: HTTPCode.DONE,
+                id: id,
+                type: type,
+                url: url,
+                options: options,
+                response: request.response,
+                error: request.error,
+                body: request.body
+            });
+        }
     }
 
-    private onStart(): void {
-        // TODO start
-    }
-
-    private onStop(): void {
-        // TODO stop
+    private onStop(procesData: ProcessData): void {
+        const listener: ((data: ProcessData) => void) | undefined = this.map.get(procesData.id);
+        if (listener !== undefined) {
+            listener(procesData);
+        }
     }
 }
