@@ -26,4 +26,9 @@ export namespace CloudDatabase {
         has(id: string): boolean;
     }
 
+    export interface Bots {
+        get(id: string): string;
+        has(id: string): boolean;
+    }
+
 }

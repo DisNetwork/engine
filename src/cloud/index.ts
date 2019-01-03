@@ -7,6 +7,7 @@ export interface CloudEngine {
     channels: CloudDatabase.Channels;
     users: CloudDatabase.Users;
     apps: CloudDatabase.Apps;
+    bots: CloudDatabase.Bots;
 }
 
 // Export everything from database

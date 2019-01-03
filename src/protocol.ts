@@ -9,9 +9,11 @@ import { wait } from './until';
 import path = require('path');
 import { CoreOptions } from 'request';
 import { HTTPRequest } from './http';
+import { MessageManager } from './manager';
 
-class ProcessData {
-    public id: string = "";
+export class ProcessData {
+    public botId: string = "";
+    public token: string = "";
     public started: number = new Date().getTime();
     public stopped: number = new Date().getTime();
     public outOfTimeout: boolean = false;
@@ -29,18 +31,20 @@ export class ExecutorManager {
 
     private _cloud: CloudEngine | undefined;
     private apps: any | undefined;
+    private bots: any | undefined;
     private map: Map<string, BotExecutor>;
     private process: ChildProcess | undefined;
 
     public constructor(
-        private protocol: ExecutorProtocol,
+        private _protocol: ExecutorProtocol,
         private executorPath: string,
         private host: string,
         private endpoint: string,
         private logLevel: LoggerLevel,
         private debug: boolean,
         cloud?: CloudEngine,
-        apps?: any
+        apps?: any,
+        bots?: any,
     ) {
         this._cloud = cloud;
         this.map = new Map();
@@ -51,19 +55,35 @@ export class ExecutorManager {
                 console.log('[Local Apps] '.cyan + 'Loaded! '.green + ("" + appId).reset);
             }
         }
+        if (bots !== undefined) {
+            this.bots = bots;
+            for (const botId in bots) {
+                console.log('[Local Bots] '.green + 'Loaded! '.green + ("" + botId).reset);
+            }
+        }
+    }
+
+    public execute(botId: string, appId: string, payload: any, listener: (data: ProcessData) => void) {
+        const appPath: string = this.apps[appId].path;
+        const token: string = this.bots[botId];
+        const timeout: number = 5000;
+        this.protocol.execute(botId + v1(), token, appPath, payload, timeout, listener);
     }
 
     public executor(
         appId: string,
+        botId: string,
         type: BotExecuteType
     ): BotExecutor {
         let token: string = "";
         if (this.cloud === undefined) {
-            token = this.apps[appId];
+            token = this.bots[botId];
         } else {
-            token = this.cloud.apps.get(appId);
+            token = this.cloud.bots.get(botId);
         }
-        const executor: BotExecutor = new BotExecutor(this.endpoint, appId, token, type, this.logLevel, this.cloud);
+        const executor: BotExecutor = new BotExecutor(
+            this.endpoint, botId, appId, token, type, this.logLevel, this.cloud
+        );
         return executor;
     }
 
@@ -90,9 +110,15 @@ export class ExecutorManager {
         });
     }
 
-    public gateway(appId: string): BotExecutor {
-        const executor: BotExecutor = this.executor(appId, BotExecuteType.GATEWAY);
-        this.add('gateway_' + appId, executor);
+    public gateway(appId: string, botId: string): BotExecutor {
+        const executor: BotExecutor = this.executor(appId, botId, BotExecuteType.GATEWAY);
+        this.add('gateway_' + botId, executor);
+        return executor;
+    }
+
+    public message(appId: string, botId: string, type: 'create' | 'update' | 'delete'): BotExecutor {
+        const executor: BotExecutor = this.executor(appId, botId, BotExecuteType.MESSAGE);
+        (executor.manager as MessageManager).type = type;
         return executor;
     }
 
@@ -113,6 +139,10 @@ export class ExecutorManager {
     get cloud(): CloudEngine | undefined {
         return this._cloud;
     }
+
+    get protocol(): ExecutorProtocol {
+        return this._protocol;
+    }
 }
 
 export class ExecutorProtocol {
@@ -121,7 +151,8 @@ export class ExecutorProtocol {
     private timeout: number;
     private key: string | undefined;
     private connected: boolean = false;
-    private map: Map<string, (data: ProcessData) => void>;
+    private listeners: Map<string, (data: ProcessData) => void>;
+    private tokens: Map<string, string>;
 
     public constructor(
         private _port: number,
@@ -129,7 +160,8 @@ export class ExecutorProtocol {
     ) {
         this.timeout = this.default_timeout;
         this.server = SocketIO();
-        this.map = new Map();
+        this.listeners = new Map();
+        this.tokens = new Map();
         this.server.on('connection', (socket) => {
             if (this.socket !== undefined) {
                 socket.disconnect(true);
@@ -144,17 +176,19 @@ export class ExecutorProtocol {
         });
     }
 
-    public execute(id: string, p: string, timeout: number, listener: (data: ProcessData) => void) {
+    public execute(
+        id: string, token: string, p: string,
+        timeout: number, payload: any, listener: (data: ProcessData) => void
+    ) {
         if (this.socket !== undefined) {
             const data: any = {
-                id: undefined,
-                path: undefined,
-                timeout: undefined
+                id: id,
+                path: p,
+                timeout: timeout,
+                payload: payload
             };
-            data.id = id;
-            data.path = p;
-            data.timeout = timeout;
-            this.map.set(id, listener);
+            this.listeners.set(id, listener);
+            this.tokens.set(id, token);
             this.socket.emit('start', data);
         }
     }
@@ -217,6 +251,7 @@ export class ExecutorProtocol {
 
     private async onHttp(data: any) {
         const id: string = data.id;
+        const botId: string = data.processId;
         const type: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' = data.type;
         const url: string = data.url;
         if (!url.startsWith("http") && !url.startsWith("https")) {
@@ -235,7 +270,12 @@ export class ExecutorProtocol {
             }
         }
         const options: CoreOptions = data.options;
-        const request: HTTPRequest = await new HTTPRequest(type, url, 10000, options).send();
+        const tokenHeader: boolean = data.tokenHeader;
+        let token: string | undefined = this.tokens.get(id);
+        if (token === undefined) {
+            token = "";
+        }
+        const request: HTTPRequest = await new HTTPRequest(type, url, 10000, options, tokenHeader, token).send();
         if (this.socket !== undefined) {
             this.socket.emit('http', {
                 code: HTTPCode.DONE,
@@ -251,7 +291,7 @@ export class ExecutorProtocol {
     }
 
     private onStop(procesData: ProcessData): void {
-        const listener: ((data: ProcessData) => void) | undefined = this.map.get(procesData.id);
+        const listener: ((data: ProcessData) => void) | undefined = this.listeners.get(procesData.botId);
         if (listener !== undefined) {
             listener(procesData);
         }

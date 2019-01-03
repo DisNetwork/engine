@@ -2,6 +2,7 @@ import express from 'express';
 import { MessageController, BotController } from './controller';
 import { CoreOptions, post, get, del, Request, Response, put, patch, head } from 'request';
 import { wait } from './until';
+import { parse, UrlWithStringQuery } from 'url';
 
 export class HTTPRequest {
     public done: boolean = false;
@@ -14,8 +15,20 @@ export class HTTPRequest {
         private type: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD',
         private _url: string,
         private timeout: number,
-        private options: CoreOptions
+        private options: CoreOptions,
+        private tokenHeader: boolean,
+        private token: string
     ) {
+        const parsedUrl: UrlWithStringQuery = parse(this._url);
+        // Protect bots from stealing their tokens by other hostnames
+        if (parsedUrl.hostname !== "discordapp.com" && this.tokenHeader) {
+            return;
+        }
+        if (tokenHeader) {
+            options.headers = {
+                Authorization: this.token
+            };
+        }
     }
 
     public async send(): Promise<any> {
@@ -72,8 +85,19 @@ export class HTTPManager {
 
     public constructor(private _port: number) {
         this.app = express();
+        this.app.use(this.middleware);
         this.app.use('/message', MessageController);
         this.app.use('/bot', BotController);
+    }
+
+    public middleware(req: express.Request, res: express.Response, next: express.NextFunction) {
+        if (req.headers.authorization) {
+            (req as any).botId = req.headers.authorization;
+        }
+        if (req.headers["user-agent"]) {
+            (req as any).appId = req.headers["user-agent"];
+        }
+        next();
     }
 
     public async start(): Promise<any> {

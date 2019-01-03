@@ -1,8 +1,38 @@
+import { Response, CoreOptions } from 'request';
 import SocketIO from 'socket.io';
 import SocketIOClient from 'socket.io-client';
 import program from 'commander';
 import { ChildProcess, exec } from 'child_process';
 import { wait } from './until';
+
+enum HTTPCode {
+    DONE = 0,
+    URL_NOT_FOR_HTTP = -1,
+    REJECTED_HOSTNAME = -2
+}
+
+class HTTPResponse {
+    public id: string = "";
+    public done: boolean = false;
+    public error: Error | undefined;
+    public response: Response | undefined;
+    public body: any | undefined;
+    public code: HTTPCode = HTTPCode.DONE;
+}
+
+class HTTPRequest {
+
+    public constructor(
+        public id: string,
+        public processId: string,
+        public type: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD',
+        public url: string,
+        public options: CoreOptions,
+        public tokenHeader: boolean
+    ) {
+    }
+
+}
 
 class ProcessData {
     public id: string = "";
@@ -13,6 +43,7 @@ class ProcessData {
 }
 
 class Process {
+    public httpReqest: HTTPRequest | undefined;
     public started: number | undefined = undefined;
     public stopped: number | undefined = undefined;
     public socket: SocketIO.Socket | undefined = undefined;
@@ -100,7 +131,8 @@ if (program.listen) {
 
 // Connection to the engine
 const io: SocketIOClient.Socket = SocketIOClient(`${host}:${port}`);
-const map: Map<string, Process> = new Map();
+const processes: Map<string, Process> = new Map();
+const requests: Map<string, string> = new Map();
 
 io.on('connect', () => {
     io.emit('identity', key);
@@ -118,7 +150,18 @@ io.on('start', (data: any) => {
     const path: string = data.path;
     const timeout: number = data.timeout;
     const process: Process = new Process(id, path, timeout, payload);
-    map.set(id, process);
+    processes.set(id, process);
+});
+
+io.on('http', (data: HTTPResponse) => {
+    const processID: string | undefined = requests.get(data.id);
+    if (processID) {
+        const process: Process | undefined = processes.get(processID);
+        if (process && process.socket) {
+            data.id = data.id.substring(processID.length + 1, data.id.length);
+            process.socket.emit('http', data);
+        }
+    }
 });
 
 io.connect();
@@ -126,11 +169,14 @@ io.connect();
 // A server for converstion between executor and apps
 const server: SocketIO.Server = SocketIO();
 server.on('connection', (socket) => {
+
+    // Identitiy the connection and start processing
     socket.on('identity', async (id) => {
-        if (map.has(id)) {
-            const process: Process | undefined = map.get(id);
+        if (processes.has(id)) {
+            const process: Process | undefined = processes.get(id);
             if (process !== undefined) {
                 process.socket = socket;
+                (socket as any).process = process;
                 const processData: ProcessData = await process.start();
                 io.emit('stop', processData);
             }
@@ -138,5 +184,31 @@ server.on('connection', (socket) => {
             socket.disconnect(true);
         }
     });
+
+    // Handle the http request
+    socket.on('http', async (data: any) => {
+        const id: string = data.id;
+        const type: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' = data.type;
+        const url: string  = data.url;
+        const options: CoreOptions = data.options;
+        const process: Process = (socket as any).process;
+        const tokenHeader: boolean = data.tokenHeader;
+        // Check if there's a process and current request is handling
+        if (process && !process.httpReqest) {
+            const request: HTTPRequest = new HTTPRequest(
+                process.id + "_" + id, // kill the overwrite bug
+                process.id, type, url, options, tokenHeader
+            );
+            requests.set(request.id, process.id);
+            io.emit('http', {
+                id: request.id,
+                type: request.type,
+                url: request.url,
+                options: request.options
+            });
+        }
+    });
+
+    // Tell the process that he connected
     socket.emit('connect');
 });

@@ -1,23 +1,25 @@
 import { CoreGuilds } from './core/guild';
 import { CloudEngine } from './cloud';
 import { LoggerLevel, Logger } from './logger';
-import { Manager } from './manager';
+import { Manager, MessageManager } from './manager';
 import { GatewayManager } from './gateway';
 import { CoreChannels } from './core/channel';
 import { get, post, CoreOptions, Response } from 'request';
 
 export class BotExecutor {
     private static instance: BotExecutor;
+    private botId: string;
     private appId: string;
     private token: string;
     private logger: Logger;
-    private _manager: Manager | GatewayManager | undefined;
+    private _manager: Manager | undefined;
     private _cloud: CloudEngine | undefined;
     private _coreGuilds: CoreGuilds | undefined;
     private _coreChannels: CoreChannels | undefined;
 
     public constructor(
         private endpoint: string,
+        botId: string,
         appId: string,
         token: string,
         type: BotExecuteType,
@@ -27,6 +29,7 @@ export class BotExecutor {
         if (BotExecutor.instance) {
             throw new Error("More then one instance for the bot executor");
         }
+        this.botId = botId;
         this.appId = appId;
         this.token = token;
         this.logger = new Logger(logLevel, "[DisNetwork] [LOG] ");
@@ -38,6 +41,8 @@ export class BotExecutor {
         }
         if (type === BotExecuteType.GATEWAY) {
             this._manager = new GatewayManager(this, this.token, this.logger);
+        } else if (type === BotExecuteType.MESSAGE) {
+            this._manager = new MessageManager(botId, appId);
         }
     }
 
@@ -82,14 +87,15 @@ export class BotExecutor {
         return this._coreChannels;
     }
 
-    get manager(): Manager | GatewayManager | undefined {
+    get manager(): Manager | GatewayManager | MessageManager | undefined {
         return this._manager;
     }
 
 }
 
 export enum BotExecuteType {
-    GATEWAY = 0
+    GATEWAY = 0,
+    MESSAGE = 1
 }
 
 // Export everything from Manager

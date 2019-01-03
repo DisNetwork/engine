@@ -5,13 +5,10 @@ import { BotExecutor } from '..';
 const router: Router = Router();
 
 router.post('/start', (req: Request, res: Response) => {
-    if (!req.headers.authorization) {
-        res.sendStatus(202);
-        return;
-    }
-    const appId: string = req.headers.authorization;
+    const botId: string = (req as any).botId;
+    const appId: string = (req as any).appId;
     const executorManager: ExecutorManager = ExecutorManager.instance;
-    const executor: BotExecutor = executorManager.gateway(appId);
+    const executor: BotExecutor = executorManager.gateway(appId, botId);
     executor.execute();
     res.sendStatus(200);
 });
