@@ -6,6 +6,7 @@ export interface Manager {
 
 export class MessageManager implements Manager {
     public type: 'create' | 'update' | 'delete' = 'create';
+    public body: any;
 
     public constructor(
         private botId: string,
@@ -16,7 +17,8 @@ export class MessageManager implements Manager {
     public execute(): void {
         const executorManager: ExecutorManager = ExecutorManager.instance;
         executorManager.execute(this.botId, this.appId, {
-            type: this.type
+            type: this.type,
+            body: this.body
         }, (data: ProcessData) => {
             if (data.code === 0) {
                 console.log("Executed message");

@@ -7,7 +7,6 @@ import { CoreChannels } from './core/channel';
 import { get, post, CoreOptions, Response } from 'request';
 
 export class BotExecutor {
-    private static instance: BotExecutor;
     private botId: string;
     private appId: string;
     private token: string;
@@ -26,9 +25,6 @@ export class BotExecutor {
         logLevel: LoggerLevel,
         cloud?: CloudEngine
     ) {
-        if (BotExecutor.instance) {
-            throw new Error("More then one instance for the bot executor");
-        }
         this.botId = botId;
         this.appId = appId;
         this.token = token;
@@ -52,12 +48,14 @@ export class BotExecutor {
         }
     }
 
-    public fire(type: 'GET' | 'POST', path: string, payload: any): void {
+    public fire(type: 'GET' | 'POST', path: string, $body?: any): void {
         const url: string = this.endpoint + path;
         const options: CoreOptions = {
             headers: {
-                authorization: this.appId
-            }
+                "authorization": this.botId,
+                "user-agent": this.appId
+            },
+            json: $body
         };
         this.logger.debug(`${type} -> ${path} [ ${this.appId} ]`);
         const callback: any = (error: any, res: Response, body: any) => {

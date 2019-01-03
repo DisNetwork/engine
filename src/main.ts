@@ -21,6 +21,7 @@ async function start() {
         .version('0.0.2', '-v, --version')
         .option('-l, --log-level <level>', 'Logger level type')
         .option('-a, --apps [file]', 'Enable the using of the local apps ( default: apps.json )')
+        .option('-b, --bots [file]', 'Enable the using of the local bots ( default: bots.json )')
         .option('-f, --executor-file <filename>', 'Set the executor path ( default: out/executor.js )')
         .option('-e, --endpoint <endpoint>', 'Change the endpoint of the engine ( default: http://localhost )')
         .option('-h, --http-port <port>', 'Specify the http port')
@@ -31,7 +32,9 @@ async function start() {
         .parse(process.argv);
     let loggerLevel: LoggerLevel = LoggerLevel.INFO;
     let apps: any;
+    let bots: any;
     let appsFile: string = "./apps.json";
+    let botsFile: string = "./bots.json";
     let executorFile: string = "out/executor.js";
     let endpoint: string = "http://localhost:2030/";
     let host: string = "localhost";
@@ -47,6 +50,12 @@ async function start() {
             appsFile = "./" + program.apps;
         }
         apps = require(appsFile);
+    }
+    if (program.bots) {
+        if (program.bots !== true) {
+            botsFile = "./" + program.bots;
+        }
+        bots = require(botsFile);
     }
     if (program.executorFile) {
         executorFile = program.executorFile;
@@ -99,7 +108,8 @@ async function start() {
         loggerLevel,
         debug,
         undefined,
-        apps
+        apps,
+        bots
     );
     if (executorManager.cloud === undefined) {
         console.log('[CloudEngine] No cloud engine found! The engine is going to use the local cache'.red);

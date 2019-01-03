@@ -4,19 +4,20 @@ import { ExecutorManager } from '../protocol';
 
 const router: Router = Router();
 
-router.get('/create', (req: Request, res: Response) => {
+router.post('/create', (req: Request, res: Response) => {
    const botId: string = (req as any).botId;
    const appId: string = (req as any).appId;
    const executorManager: ExecutorManager = ExecutorManager.instance;
-   const executor: BotExecutor = executorManager.message(appId, botId, 'create');
+   const executor: BotExecutor = executorManager.message(appId, botId, 'create', req.body);
    executor.execute();
+   res.sendStatus(200);
 });
 
-router.get('/update', (req: Request, res: Response) => {
+router.post('/update', (req: Request, res: Response) => {
     // TODO message update execute
 });
 
-router.get('/delete', (req: Request, res: Response) => {
+router.post('/delete', (req: Request, res: Response) => {
     // TODO message delete execute
 });
 

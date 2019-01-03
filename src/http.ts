@@ -1,51 +1,51 @@
 import express from 'express';
 import { MessageController, BotController } from './controller';
-import { CoreOptions, post, get, del, Request, Response, put, patch, head } from 'request';
+import request from 'request';
 import { wait } from './until';
 import { parse, UrlWithStringQuery } from 'url';
+import { json, urlencoded } from 'body-parser';
 
 export class HTTPRequest {
     public done: boolean = false;
     public error: Error | undefined;
-    public request: Request | undefined;
-    public response: Response | undefined;
+    public request: request.Request | undefined;
+    public response: request.Response | undefined;
     public body: any | undefined;
 
     public constructor(
         private type: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD',
-        private _url: string,
+        private url: string,
         private timeout: number,
-        private options: CoreOptions,
+        private options: request.CoreOptions,
         private tokenHeader: boolean,
         private token: string
     ) {
-        const parsedUrl: UrlWithStringQuery = parse(this._url);
+        const parsedUrl: UrlWithStringQuery = parse(this.url);
         // Protect bots from stealing their tokens by other hostnames
         if (parsedUrl.hostname !== "discordapp.com" && this.tokenHeader) {
             return;
         }
         if (tokenHeader) {
             options.headers = {
-                Authorization: this.token
+                "Authorization": "Bot " + this.token,
+                "Content-Type": "application/json"
             };
         }
     }
 
     public async send(): Promise<any> {
         return new Promise(async (resolve, reject) => {
-            if (this.type === 'GET') {
-                this.request = get(this.url, this.options, this.callback);
-            } else if (this.type === 'POST') {
-                this.request = post(this.url, this.options, this.callback);
-            } else if (this.type === 'PUT') {
-                this.request = put(this.url, this.options, this.callback);
-            } else if (this.type === 'DELETE') {
-                this.request = del(this.url, this.options, this.callback);
-            } else if (this.type === 'PATCH') {
-                this.request = patch(this.url, this.options, this.callback);
-            } else if (this.type === 'HEAD') {
-                this.request = head(this.url, this.options, this.callback);
+            const url: string = this.url;
+            if (this.options.body) {
+                this.options.body = JSON.stringify(this.options.body);
             }
+            const requestOptions: request.CoreOptions = {
+                method: this.type
+            };
+            for (const option in this.options) {
+                (requestOptions as any)[option] = (this.options as any)[option];
+            }
+            this.request = request(url, requestOptions, this.callback);
             while (this.timeout > 0) {
                 if (this.done) {
                     break;
@@ -64,7 +64,7 @@ export class HTTPRequest {
         });
     }
 
-    private callback(error: Error, response: Response, body: any): void {
+    private callback(error: Error, response: request.Response, body: any): void {
         this.done = true;
         if (error) {
             this.error = error;
@@ -74,10 +74,6 @@ export class HTTPRequest {
         this.body = body;
     }
 
-    get url(): string {
-        return this._url;
-    }
-
 }
 
 export class HTTPManager {
@@ -85,6 +81,8 @@ export class HTTPManager {
 
     public constructor(private _port: number) {
         this.app = express();
+        this.app.use(json());
+        this.app.use(urlencoded({extended: true}));
         this.app.use(this.middleware);
         this.app.use('/message', MessageController);
         this.app.use('/bot', BotController);

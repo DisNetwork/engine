@@ -64,10 +64,11 @@ export class ExecutorManager {
     }
 
     public execute(botId: string, appId: string, payload: any, listener: (data: ProcessData) => void) {
-        const appPath: string = this.apps[appId].path;
-        const token: string = this.bots[botId];
+        const appPath: string = this.apps[appId];
+        const token: string = this.bots[botId].token;
         const timeout: number = 5000;
-        this.protocol.execute(botId + v1(), token, appPath, payload, timeout, listener);
+        const uuid: string = v1();
+        this.protocol.execute(`${botId}${uuid}`, token, appPath, timeout, payload, listener);
     }
 
     public executor(
@@ -77,7 +78,7 @@ export class ExecutorManager {
     ): BotExecutor {
         let token: string = "";
         if (this.cloud === undefined) {
-            token = this.bots[botId];
+            token = this.bots[botId].token;
         } else {
             token = this.cloud.bots.get(botId);
         }
@@ -91,14 +92,17 @@ export class ExecutorManager {
         return new Promise(async (resolve: any) => {
             const p: string = path.resolve(this.executorPath);
             const key: string = this.protocol.init();
-            if (!this.debug) {
-                const command: string = 'node "' + p + `" -h http://${this.host} -p ${this.protocol.port} -k ${key}`;
-                this.process = exec(command);
-            } else {
+            if (this.debug) {
                 console.log('[DEBUG] '.yellow + "Host:".yellow + (" " + this.host).white);
                 console.log('[DEBUG] '.yellow + "Port:".yellow + (" " + this.protocol.port).white);
                 console.log('[DEBUG] '.yellow + "Key:".yellow + (" " + key).white);
             }
+            const d: string = this.debug ? " --inspect-brk=41032" : "";
+            const command: string = 'node "' + p + `"${d} -h http://${this.host} -p ${this.protocol.port} -k ${key}`;
+            this.process = exec(command);
+            this.process.on('close', (code: number) => {
+                console.log("[CONSOLE] ".yellow + ("Died with code " + code).red);
+            });
             const opened: boolean = await this.protocol.open();
             if (!opened) {
                 if (this.process !== undefined) {
@@ -116,9 +120,10 @@ export class ExecutorManager {
         return executor;
     }
 
-    public message(appId: string, botId: string, type: 'create' | 'update' | 'delete'): BotExecutor {
+    public message(appId: string, botId: string, type: 'create' | 'update' | 'delete', body: any): BotExecutor {
         const executor: BotExecutor = this.executor(appId, botId, BotExecuteType.MESSAGE);
         (executor.manager as MessageManager).type = type;
+        (executor.manager as MessageManager).body = body;
         return executor;
     }
 
@@ -172,6 +177,7 @@ export class ExecutorProtocol {
             socket.on('ping', () => this.onPing());
             socket.on('http', (data: any) => this.onHttp(data));
             socket.on('stop', (data: ProcessData) => this.onStop(data));
+            socket.on('print', (data: any) => this.onPrint(data));
             socket.emit('connect');
         });
     }
@@ -271,7 +277,7 @@ export class ExecutorProtocol {
         }
         const options: CoreOptions = data.options;
         const tokenHeader: boolean = data.tokenHeader;
-        let token: string | undefined = this.tokens.get(id);
+        let token: string | undefined = this.tokens.get(botId);
         if (token === undefined) {
             token = "";
         }
@@ -295,5 +301,9 @@ export class ExecutorProtocol {
         if (listener !== undefined) {
             listener(procesData);
         }
+    }
+
+    private onPrint(print: any): void {
+        console.log("[CONSOLE] ".yellow, print);
     }
 }

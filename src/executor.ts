@@ -2,8 +2,12 @@ import { Response, CoreOptions } from 'request';
 import SocketIO from 'socket.io';
 import SocketIOClient from 'socket.io-client';
 import program from 'commander';
-import { ChildProcess, exec } from 'child_process';
+import { ChildProcess, exec, execFile } from 'child_process';
 import { wait } from './until';
+
+console.log = (print: any) => {
+    io.emit('print', print);
+};
 
 enum HTTPCode {
     DONE = 0,
@@ -47,7 +51,7 @@ class Process {
     public started: number | undefined = undefined;
     public stopped: number | undefined = undefined;
     public socket: SocketIO.Socket | undefined = undefined;
-    private process: ChildProcess;
+    public process: ChildProcess;
 
     public constructor(
         public id: string,
@@ -55,7 +59,21 @@ class Process {
         private timeout: number,
         public payload: any
     ) {
-        this.process = exec('node "' + this.path + `" -h ${host} -p ${port} -k ${this.id}`);
+        console.log("Running the process...");
+        const command: string = 'node "' + this.path + `" -h ${host} -p ${listen} -k ${this.id}`;
+        const nodeExePath: string = process.execPath;
+        const args: string[] = [
+            this.path,
+            "-h",
+            host,
+            "-p",
+            "" + listen,
+            "-k",
+            this.id
+        ];
+        console.log("Command -> " + command);
+        this.process = execFile(nodeExePath, args);
+        console.log("[Process] Started with PID::" + this.process.pid);
         this.process.on('close', (code) => this.onClose(code));
     }
 
@@ -79,6 +97,7 @@ class Process {
                     processData.outOfTime = true;
                     if (!this.process.killed) {
                         this.process.kill();
+                        console.log("[AUTO-KILL] killed process PID::" + process.pid);
                         processData.code = -1;
                     }
                     this.stopped = new Date().getTime();
@@ -88,6 +107,7 @@ class Process {
                 processData.stopped = this.stopped;
                 if (!this.process.killed) {
                     this.process.kill();
+                    console.log("[AUTO-KILL] killed process PID::" + process.pid);
                     processData.code = -1;
                 }
                 resolve(processData);
@@ -97,6 +117,7 @@ class Process {
 
     private onClose(code: number): void {
         this.stopped = new Date().getTime();
+        console.log("Process closed with CODE::" + code);
     }
 }
 
@@ -170,6 +191,11 @@ io.connect();
 const server: SocketIO.Server = SocketIO();
 server.on('connection', (socket) => {
 
+    // Log the stuff from the applications
+    socket.on('log', (print: any) => {
+        console.log(`[APP] [Process::${(socket as any).process.process.pid}] => ` + print);
+    });
+
     // Identitiy the connection and start processing
     socket.on('identity', async (id) => {
         if (processes.has(id)) {
@@ -178,6 +204,11 @@ server.on('connection', (socket) => {
                 process.socket = socket;
                 (socket as any).process = process;
                 const processData: ProcessData = await process.start();
+                if (!process.process.killed) {
+                    process.process.kill();
+                    console.log("[AUTO-KILL] killed process PID -> " + process.process.pid);
+                }
+                (processData as any).botId = process.id;
                 io.emit('stop', processData);
             }
         } else {
@@ -202,9 +233,11 @@ server.on('connection', (socket) => {
             requests.set(request.id, process.id);
             io.emit('http', {
                 id: request.id,
+                processId: process.id,
                 type: request.type,
                 url: request.url,
-                options: request.options
+                options: request.options,
+                tokenHeader: tokenHeader
             });
         }
     });
