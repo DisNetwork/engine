@@ -1,7 +1,7 @@
 import { CoreGuilds } from './core/guild';
 import { CloudEngine } from './cloud';
 import { LoggerLevel, Logger } from './logger';
-import { Manager, MessageManager, GuildManager } from './manager';
+import { Manager, MessageManager, GuildManager, ChannelManager } from './manager';
 import { GatewayManager } from './gateway';
 import { CoreChannels } from './core/channel';
 import { get, post, CoreOptions, Response } from 'request';
@@ -41,6 +41,8 @@ export class BotExecutor {
             this._manager = new MessageManager(botId, appId);
         } else if (type === BotExecuteType.GUILD) {
             this._manager = new GuildManager(botId, appId);
+        } else if (type === BotExecuteType.CHANNEL) {
+            this._manager = new ChannelManager(botId, appId);
         }
     }
 
