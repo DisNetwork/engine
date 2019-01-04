@@ -1,4 +1,4 @@
-import { SnowFlake, Guilds, Guild, Channel, ChannelType } from '@disnetwork/core';
+import { CoreSnowFlake, ChannelType } from "./src";
 
 /**
  * Executes the bot ( You can create only one instance )
@@ -82,24 +82,24 @@ export declare namespace CloudDatabase {
      * Deal with guilds in the cloud
      */
     export interface Guilds {
-        get(id: SnowFlake): any;
-        has(id: SnowFlake): boolean;
+        get(id: CoreSnowFlake): any;
+        has(id: CoreSnowFlake): boolean;
     }
 
     /**
      * Deal with channels in the cloud
      */
     export interface Channels {
-        get(id: SnowFlake): any;
-        has(id: SnowFlake): boolean;
+        get(id: CoreSnowFlake): any;
+        has(id: CoreSnowFlake): boolean;
     }
 
     /**
      * Deal with users in the cloud
      */
     export interface Users {
-        get(id: SnowFlake): any;
-        has(id: SnowFlake): boolean;
+        get(id: CoreSnowFlake): any;
+        has(id: CoreSnowFlake): boolean;
     }
 }
 
@@ -130,20 +130,20 @@ export declare interface CloudEngine {
 }
 
 /**
- * Convert from string to SnowFlake
+ * Convert from string to CoreSnowFlake
  */
-export declare class SnowFlakeConvertor {
+export declare class CoreSnowFlakeConvertor {
 
-    public static fromString(id: string): SnowFlake;
+    public static fromString(id: string): CoreSnowFlake;
 }
 
 /**
- * Overrided core snowflake
+ * Overrided core CoreSnowFlake
  */
-export declare class CoreSnowFlake implements SnowFlake {
+export declare class CoreCoreSnowFlake implements CoreSnowFlake {
 
     /**
-     * The id of the snowflake
+     * The id of the CoreSnowFlake
      */
     public readonly id: number;
 }
@@ -151,12 +151,12 @@ export declare class CoreSnowFlake implements SnowFlake {
 /**
  * Deal with the guild
  */
-export declare class CoreGuild implements Guild {
+export declare class CoreGuild {
 
     /**
-     * SnowFlake ID of the guild
+     * CoreSnowFlake ID of the guild
      */
-    public id: SnowFlake;
+    public id: CoreSnowFlake;
 
     /**
      * Name of the guild
@@ -169,36 +169,36 @@ export declare class CoreGuild implements Guild {
     public icon?: string;
 
     /**
-     * Owner SnowFlake ID of the guild
+     * Owner CoreSnowFlake ID of the guild
      */
-    public ownerId: SnowFlake;
+    public ownerId: CoreSnowFlake;
 }
 
 /**
  * Deal with the guilds of the bot
  */
-export declare class CoreGuilds implements Guilds {
+export declare class CoreGuilds {
 
     /**
      * Get the guild that the bot is apart of it
      */
-    public get(id: SnowFlake): CoreGuild;
+    public get(id: CoreSnowFlake): CoreGuild;
 
     /**
      * Check if the bot is in that guild or not
      */
-    public has(id: SnowFlake): boolean;
+    public has(id: CoreSnowFlake): boolean;
 }
 
 /**
  * Deal with channel
  */
-export declare class CoreChannel implements Channel {
+export declare class CoreChannel {
 
     /**
      * Id of the channel
      */
-    public id: SnowFlake;
+    public id: CoreSnowFlake;
 
     /**
      * Type of the channel
@@ -208,7 +208,7 @@ export declare class CoreChannel implements Channel {
     /**
      * Guild id of the channel
      */
-    public guild_id: SnowFlake | undefined;
+    public guild_id: CoreSnowFlake | undefined;
 
     /**
      * Position of the channel
@@ -233,7 +233,7 @@ export declare class CoreChannel implements Channel {
     /**
      * Last message Id of the channel
      */
-    public last_message_id: SnowFlake | undefined;
+    public last_message_id: CoreSnowFlake | undefined;
 
     /**
      * Bitrate of the channel
@@ -253,7 +253,7 @@ export declare class CoreChannel implements Channel {
     /**
      * Parent id of the channel
      */
-    public parent_id: SnowFlake | undefined;
+    public parent_id: CoreSnowFlake | undefined;
 }
 
 /**
@@ -264,10 +264,10 @@ export declare class CoreChannels {
     /**
      * Get the channel of the bot
      */
-    public get(id: SnowFlake): CoreChannel;
+    public get(id: CoreSnowFlake): CoreChannel;
 
     /**
      * Check if the bot is here
      */
-    public has(id: SnowFlake): boolean;
+    public has(id: CoreSnowFlake): boolean;
 }
