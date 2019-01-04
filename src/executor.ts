@@ -2,7 +2,7 @@ import { Response, CoreOptions } from 'request';
 import SocketIO from 'socket.io';
 import SocketIOClient from 'socket.io-client';
 import program from 'commander';
-import { ChildProcess, exec, execFile } from 'child_process';
+import { ChildProcess, execFile } from 'child_process';
 import { wait } from './until';
 
 console.log = (print: any) => {

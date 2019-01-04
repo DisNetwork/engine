@@ -1,15 +1,14 @@
-import { Guild, SnowFlake, Guilds } from '@disnetwork/core';
 import { CoreSnowFlake } from '.';
 
-export class CoreGuild implements Guild {
+export class CoreGuild {
     public static readonly EMPTY: CoreGuild = new CoreGuild(CoreSnowFlake.EMPTY, "EMPTY_GUILD", CoreSnowFlake.EMPTY);
 
-    public id: SnowFlake;
+    public id: CoreSnowFlake;
     public name: string;
     public icon?: string;
-    public ownerId: SnowFlake;
+    public ownerId: CoreSnowFlake;
 
-    public constructor(id: SnowFlake, name: string, ownerId: SnowFlake) {
+    public constructor(id: CoreSnowFlake, name: string, ownerId: CoreSnowFlake) {
         this.id = id;
         this.ownerId = ownerId;
         this.name = name;
@@ -17,9 +16,9 @@ export class CoreGuild implements Guild {
 
 }
 
-export class CoreGuilds implements Guilds {
+export class CoreGuilds {
 
-    private guilds: Map<SnowFlake, CoreGuild>;
+    private guilds: Map<CoreSnowFlake, CoreGuild>;
 
     public constructor() {
         this.guilds = new Map();
@@ -29,7 +28,7 @@ export class CoreGuilds implements Guilds {
         this.guilds.set(guild.id, guild);
     }
 
-    public get(id: SnowFlake): CoreGuild {
+    public get(id: CoreSnowFlake): CoreGuild {
         if (this.has(id)) {
             const guild: CoreGuild | undefined = this.guilds.get(id);
             if (guild === undefined) {
@@ -42,7 +41,7 @@ export class CoreGuilds implements Guilds {
         }
     }
 
-    public has(id: SnowFlake): boolean {
+    public has(id: CoreSnowFlake): boolean {
         return this.guilds.has(id);
     }
 

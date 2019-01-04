@@ -1,17 +1,15 @@
-import { SnowFlake } from "@disnetwork/core";
-
 export class SnowFlakeConvertor {
 
-    public static fromString(id: string): SnowFlake {
+    public static fromString(id: string): CoreSnowFlake {
         const stringToNumber: number = parseInt(id, undefined);
-        const snowFlake: SnowFlake = new CoreSnowFlake(stringToNumber);
+        const snowFlake: CoreSnowFlake = new CoreSnowFlake(stringToNumber);
         return snowFlake;
     }
 
 }
 
-export class CoreSnowFlake implements SnowFlake {
-    public static readonly EMPTY: SnowFlake = SnowFlakeConvertor.fromString('0');
+export class CoreSnowFlake {
+    public static readonly EMPTY: CoreSnowFlake = SnowFlakeConvertor.fromString('0');
 
     public readonly id: number;
 

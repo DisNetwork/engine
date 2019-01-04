@@ -5,16 +5,16 @@ import { Manager } from './manager';
 import { get, CoreOptions, Response } from 'request';
 import { DiscordAPI } from './discord';
 import WebSocket = require('ws');
-import { SnowFlake } from '@disnetwork/core';
 import { SnowFlakeConvertor } from './core';
 import { BotExecutor } from '.';
 import { CoreChannel, CoreChannels } from './core/channel';
+import { CoreSnowFlake } from '..';
 
 class GuildUnavailable {
-    public id: SnowFlake;
+    public id: CoreSnowFlake;
     public unavailable: boolean;
 
-    public constructor(id: SnowFlake, unavailable: boolean) {
+    public constructor(id: CoreSnowFlake, unavailable: boolean) {
         this.id = id;
         this.unavailable = unavailable;
     }
@@ -130,7 +130,7 @@ export class GatewayManager implements Manager {
                 const version: number = message.data.v;
                 const guilds: GuildUnavailable[] = message.data.guilds;
                 for (const guild of guilds) {
-                    const snowflakeId: SnowFlake = SnowFlakeConvertor.fromString("" + guild.id);
+                    const snowflakeId: CoreSnowFlake = SnowFlakeConvertor.fromString("" + guild.id);
                     const typedGuild = new GuildUnavailable(snowflakeId, guild.unavailable);
                     this.guilds.set(typedGuild.id.id, typedGuild);
                 }
@@ -141,10 +141,10 @@ export class GatewayManager implements Manager {
                 // 2 - Guild loads during the ready event
                 // 3 - Guild loads after it became to be available
                 //
-                const id: SnowFlake = SnowFlakeConvertor.fromString(message.data.id);
+                const id: CoreSnowFlake = SnowFlakeConvertor.fromString(message.data.id);
                 const name: string = message.data.name;
                 const icon: string = message.data.icon;
-                const ownerId: SnowFlake = SnowFlakeConvertor.fromString(message.data.owner_id);
+                const ownerId: CoreSnowFlake = SnowFlakeConvertor.fromString(message.data.owner_id);
                 const guild: CoreGuild = new CoreGuild(id, name, ownerId);
                 guild.icon = icon;
                 // Cache the bot when there's no cloud support on running this engine
