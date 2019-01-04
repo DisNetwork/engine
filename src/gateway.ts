@@ -278,27 +278,22 @@ export class GatewayManager implements Manager {
                     r: message.data.role_id
                 });
             } else if (message.eventName === GatewayEvent.MESSAGE_CREATE) { // When message create
-                // TODO message create execute
                 this.executor.fire('POST', 'message/create', message.data);
             } else if (message.eventName === GatewayEvent.MESSAGE_UPDATE) { // When message update
-                // TODO message update execute
                 this.executor.fire('POST', 'message/update', message.data);
             } else if (message.eventName === GatewayEvent.MESSAGE_DELETE) { // When message delete
-                // TODO message delete execute
                 this.executor.fire('POST', 'message/delete', {
                     id: message.data.id,
                     cid: message.data.channel_id,
                     gid: message.data.guild_id
                 });
             } else if (message.eventName === GatewayEvent.MESSAGE_DELETE_BULK) { // When message delete bulk
-                // TODO message delete bulk execute
                 this.executor.fire('POST', 'message/delete/bulk', {
                     ids: message.data.ids,
                     cid: message.data.channel_id,
                     gid: message.data.guild_id
                 });
             } else if (message.eventName === GatewayEvent.MESSAGE_REACTION_ADD) { // When message reaction added
-                // TODO message reaction add execute
                 this.executor.fire('POST', 'message/reaction/add', {
                     uid: message.data.user_id,
                     cid: message.data.channel_id,
@@ -307,7 +302,6 @@ export class GatewayManager implements Manager {
                     emoji: message.data.emoji
                 });
             } else if (message.eventName === GatewayEvent.MESSAGE_REACTION_REMOVE) { // When message reaction remove
-                // TODO message reaction remove execute
                 this.executor.fire('POST', 'message/reaction/remove', {
                     uid: message.data.user_id,
                     cid: message.data.channel_id,
@@ -316,14 +310,12 @@ export class GatewayManager implements Manager {
                     emoji: message.data.emoji
                 });
             } else if (message.eventName === GatewayEvent.MESSAGE_REACTION_REMOVE_ALL) {
-                // TODO message reaction remove all execute
                 this.executor.fire('POST', 'message/reaction/remove/all', {
                     cid: message.data.channel_id,
                     mid: message.data.message_id,
                     gid: message.data.guild_id
                 });
             } else if (message.eventName === GatewayEvent.PRESENCE_UPDATE) { // When presence update
-                // TODO presence update execute
                 this.executor.fire('POST', 'presence/update', {
                     user: message.data.user,
                     roles: message.data.roles,
@@ -333,8 +325,7 @@ export class GatewayManager implements Manager {
                     activties: message.data.activties
                 });
             } else if (message.eventName === GatewayEvent.TYPING_START) { // When typing start
-                // TODO typing start execute
-                this.executor.fire('POST', 'typing', {
+                this.executor.fire('POST', 'message/typing', {
                     cid: message.data.channel_id,
                     gid: message.data.guild_id,
                     uid: message.data.user_id,

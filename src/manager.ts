@@ -4,8 +4,19 @@ export interface Manager {
     execute(): void;
 }
 
+export enum MessageEventType {
+    CREATE = "create",
+    UPDATE = "update",
+    DELETE = "delete",
+    DELETE_BULK = "delete_bulk",
+    REACTION_ADD = "reaction_add",
+    REACTION_REMOVE = "reaction_remove",
+    REACTION_REMOVE_ALL = "reaction_remove_all",
+    TYPING = "typing"
+}
+
 export class MessageManager implements Manager {
-    public type: 'create' | 'update' | 'delete' = 'create';
+    public type: MessageEventType = MessageEventType.CREATE;
     public body: any;
 
     public constructor(
