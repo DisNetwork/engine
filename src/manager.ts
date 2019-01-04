@@ -50,7 +50,10 @@ export enum GuildEventType {
     INTEGRATIONS_UPDATE = "integrations_update",
     MEMBER_ADD = "member_add",
     MEMBER_REMOVE = "member_remove",
-    MEMBER_UPDATE = "member_update"
+    MEMBER_UPDATE = "member_update",
+    ROLE_CREATE = "role_create",
+    ROLE_UPDATE = "role_update",
+    ROLE_DELETE = "role_delete"
 }
 
 export class GuildManager implements Manager {

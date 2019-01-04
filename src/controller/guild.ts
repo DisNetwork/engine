@@ -57,4 +57,16 @@ router.post('/member/update', (req: Request, res: Response) => {
     execute(req, GuildEventType.MEMBER_UPDATE);
 });
 
+router.post('/role/create', (req: Request, res: Response) => {
+    execute(req, GuildEventType.ROLE_CREATE);
+});
+
+router.post('/role/update', (req: Request, res: Response) => {
+    execute(req, GuildEventType.ROLE_UPDATE);
+});
+
+router.post('/role/delete', (req: Request, res: Response) => {
+    execute(req, GuildEventType.ROLE_DELETE);
+});
+
 export const GuildController: Router = router;
