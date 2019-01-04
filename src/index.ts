@@ -104,7 +104,8 @@ export class BotExecutor {
 export enum BotExecuteType {
     GATEWAY = 0,
     MESSAGE = 1,
-    GUILD = 2
+    GUILD = 2,
+    CHANNEL = 3
 }
 
 // Export everything from Manager

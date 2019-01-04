@@ -358,6 +358,14 @@ export class GatewayManager implements Manager {
                     gid: message.data.guild_id,
                     cid: message.data.channel_id
                 });
+            } else if (message.eventName === GatewayEvent.CHANNEL_CREATE) { // When channel is created
+                this.executor.fire('POST', 'channel/create', message.data);
+            } else if (message.eventName === GatewayEvent.CHANNEL_UPADTE) { // When the channel updated
+                this.executor.fire('POST', 'channel/update', message.data);
+            } else if (message.eventName === GatewayEvent.CHANNEL_DELETE) { // When the channel deleted
+                this.executor.fire('POST', 'channel/delete', message.data);
+            } else if (message.eventName === GatewayEvent.CHANNEL_PINS_UPDATE) { // When message pins in the channel
+                this.executor.fire('POST', 'channel/pins', message.data);
             }
         }
 
