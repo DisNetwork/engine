@@ -1,6 +1,6 @@
 {
     "name": "@disnetwork/engine",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Where the DisNetwork magic happens here",
     "main": "index.js",
     "type": "index.d.ts",
