@@ -14,11 +14,21 @@ router.post('/create', (req: Request, res: Response) => {
 });
 
 router.post('/update', (req: Request, res: Response) => {
-    // TODO message update execute
+    const botId: string = (req as any).botId;
+    const appId: string = (req as any).appId;
+    const executorManager: ExecutorManager = ExecutorManager.instance;
+    const executor: BotExecutor = executorManager.message(appId, botId, 'update', req.body);
+    executor.execute();
+    res.sendStatus(200);
 });
 
 router.post('/delete', (req: Request, res: Response) => {
-    // TODO message delete execute
+    const botId: string = (req as any).botId;
+    const appId: string = (req as any).appId;
+    const executorManager: ExecutorManager = ExecutorManager.instance;
+    const executor: BotExecutor = executorManager.message(appId, botId, 'delete', req.body);
+    executor.execute();
+    res.sendStatus(200);
 });
 
 export const MessageController: Router = router;
