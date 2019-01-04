@@ -1,4 +1,4 @@
-import { CoreSnowFlake, ChannelType } from "./src";
+import { ChannelType } from "./src";
 
 /**
  * Executes the bot ( You can create only one instance )
@@ -140,7 +140,7 @@ export declare class CoreSnowFlakeConvertor {
 /**
  * Overrided core CoreSnowFlake
  */
-export declare class CoreCoreSnowFlake implements CoreSnowFlake {
+export declare class CoreSnowFlake implements CoreSnowFlake {
 
     /**
      * The id of the CoreSnowFlake
