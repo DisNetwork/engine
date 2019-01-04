@@ -39,7 +39,7 @@ export class ExecutorManager {
         private _protocol: ExecutorProtocol,
         private executorPath: string,
         private host: string,
-        private endpoint: string,
+        private _endpoint: string,
         private logLevel: LoggerLevel,
         private debug: boolean,
         cloud?: CloudEngine,
@@ -68,7 +68,7 @@ export class ExecutorManager {
         const token: string = this.bots[botId].token;
         const timeout: number = 5000;
         const uuid: string = v1();
-        this.protocol.execute(`${botId}${uuid}`, token, appPath, timeout, payload, listener);
+        this.protocol.execute(`${botId}${uuid}`, botId, token, appPath, timeout, payload, listener);
     }
 
     public executor(
@@ -83,7 +83,7 @@ export class ExecutorManager {
             token = this.cloud.bots.get(botId);
         }
         const executor: BotExecutor = new BotExecutor(
-            this.endpoint, botId, appId, token, type, this.logLevel, this.cloud
+            this._endpoint, botId, appId, token, type, this.logLevel, this.cloud
         );
         return executor;
     }
@@ -141,12 +141,20 @@ export class ExecutorManager {
         }
     }
 
+    public get(name: string): BotExecutor | undefined {
+        return this.map.get(name);
+    }
+
     get cloud(): CloudEngine | undefined {
         return this._cloud;
     }
 
     get protocol(): ExecutorProtocol {
         return this._protocol;
+    }
+
+    get endpoint(): string {
+        return this._endpoint;
     }
 }
 
@@ -183,7 +191,7 @@ export class ExecutorProtocol {
     }
 
     public execute(
-        id: string, token: string, p: string,
+        id: string, botId: string, token: string, p: string,
         timeout: number, payload: any, listener: (data: ProcessData) => void
     ) {
         if (this.socket !== undefined) {
@@ -191,7 +199,8 @@ export class ExecutorProtocol {
                 id: id,
                 path: p,
                 timeout: timeout,
-                payload: payload
+                payload: payload,
+                botId: botId
             };
             this.listeners.set(id, listener);
             this.tokens.set(id, token);

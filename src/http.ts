@@ -4,6 +4,7 @@ import request from 'request';
 import { wait } from './until';
 import { parse, UrlWithStringQuery } from 'url';
 import { json, urlencoded } from 'body-parser';
+import { ExecutorManager } from './protocol';
 
 export class HTTPRequest {
     public done: boolean = false;
@@ -22,7 +23,8 @@ export class HTTPRequest {
     ) {
         const parsedUrl: UrlWithStringQuery = parse(this.url);
         // Protect bots from stealing their tokens by other hostnames
-        if (parsedUrl.hostname !== "discordapp.com" && this.tokenHeader) {
+        const execM: ExecutorManager = ExecutorManager.instance;
+        if ((parsedUrl.hostname !== "discordapp.com" && parsedUrl.hostname !== 'localhost') && this.tokenHeader) {
             return;
         }
         if (tokenHeader) {

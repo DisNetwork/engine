@@ -55,6 +55,7 @@ class Process {
 
     public constructor(
         public id: string,
+        public botId: string,
         private path: string,
         private timeout: number,
         public payload: any
@@ -81,6 +82,7 @@ class Process {
         return new Promise(async (resolve: any) => {
             if (this.socket !== undefined) {
                 this.started = new Date().getTime();
+                this.payload.botId = this.botId;
                 this.socket.emit('start', this.payload);
                 while (this.timeout > 0) {
                     if (this.stopped === undefined) {
@@ -170,7 +172,8 @@ io.on('start', (data: any) => {
     const payload: any = data.payload;
     const path: string = data.path;
     const timeout: number = data.timeout;
-    const process: Process = new Process(id, path, timeout, payload);
+    const botId: string = data.botId;
+    const process: Process = new Process(id, botId, path, timeout, payload);
     processes.set(id, process);
 });
 

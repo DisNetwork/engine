@@ -9,6 +9,7 @@ import { SnowFlakeConvertor } from './core';
 import { BotExecutor } from '.';
 import { CoreChannel, CoreChannels } from './core/channel';
 import { CoreSnowFlake } from '..';
+import { ExecutorManager, ProcessData } from './protocol';
 
 class GuildUnavailable {
     public id: CoreSnowFlake;
@@ -67,7 +68,7 @@ export class GatewayManager implements Manager {
         });
     }
 
-    private send(message: GatewayMessage) {
+    public send(message: GatewayMessage) {
         if (this.webSocket) {
             const json: string = JSON.stringify(message.encode());
             let logJson: string = json;
@@ -92,7 +93,7 @@ export class GatewayManager implements Manager {
         msg.sequence = json.s;
         msg.eventName = json.t;
         msg.data = json.d;
-        let logJson: string = JSON.stringify(msg);
+        let logJson: string = data as string;
         if (logJson.length >= 60) {
             logJson = logJson.substring(0, 60);
             logJson += "...";
@@ -135,6 +136,14 @@ export class GatewayManager implements Manager {
                     this.guilds.set(typedGuild.id.id, typedGuild);
                 }
                 this.logger.debug("Ready! Gateway version " + version);
+                const executorManager: ExecutorManager = ExecutorManager.instance;
+                executorManager.execute(
+                    this.executor.botId,
+                    this.executor.appId,
+                    { type: 'start' }, (data: ProcessData) => {
+                        this.logger.debug("Executed the start event!");
+                    }
+                );
             } else if (message.eventName === GatewayEvent.GUILD_CREATE) { // Guild Join/Load event
                 // Guild create fires when
                 // 1 - Bot joins a guild
@@ -448,8 +457,8 @@ export class GatewayMessage {
 
     public encode(): any {
         return {
-            d: this.data === undefined ? "{}" : this.data,
             op: this.opcode,
+            d: this.data === undefined ? "{}" : this.data,
             s: this.sequence,
             t: this.eventName
         };

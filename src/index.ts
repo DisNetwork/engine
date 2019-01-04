@@ -7,8 +7,8 @@ import { CoreChannels } from './core/channel';
 import { get, post, CoreOptions, Response } from 'request';
 
 export class BotExecutor {
-    private botId: string;
-    private appId: string;
+    private _botId: string;
+    private _appId: string;
     private token: string;
     private logger: Logger;
     private _manager: Manager | undefined;
@@ -25,8 +25,8 @@ export class BotExecutor {
         logLevel: LoggerLevel,
         cloud?: CloudEngine
     ) {
-        this.botId = botId;
-        this.appId = appId;
+        this._botId = botId;
+        this._appId = appId;
         this.token = token;
         this.logger = new Logger(logLevel, "[DisNetwork] [LOG] ");
         if (cloud) {
@@ -52,18 +52,18 @@ export class BotExecutor {
         const url: string = this.endpoint + path;
         const options: CoreOptions = {
             headers: {
-                "authorization": this.botId,
-                "user-agent": this.appId
+                "authorization": this._botId,
+                "user-agent": this._appId
             },
             json: $body
         };
-        this.logger.debug(`${type} -> ${path} [ ${this.appId} ]`);
+        this.logger.debug(`${type} -> ${path} [ ${this._appId} ]`);
         const callback: any = (error: any, res: Response, body: any) => {
                 if (error) {
                     this.logger.err(`Error while firing [ ${type} ${path} ]: ` + error);
                     return;
                 }
-                this.logger.debug(`${res.statusCode} <- ${type} ${path} [ ${this.appId} ]`);
+                this.logger.debug(`${res.statusCode} <- ${type} ${path} [ ${this._appId} ]`);
             };
         if (type === 'GET') {
             get(url, options, callback);
@@ -87,6 +87,14 @@ export class BotExecutor {
 
     get manager(): Manager | GatewayManager | MessageManager | undefined {
         return this._manager;
+    }
+
+    get botId(): string {
+        return this._botId;
+    }
+
+    get appId(): string {
+        return this._appId;
     }
 
 }
