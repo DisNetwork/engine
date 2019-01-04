@@ -29,7 +29,7 @@ export class MessageManager implements Manager {
         const executorManager: ExecutorManager = ExecutorManager.instance;
         executorManager.execute(this.botId, this.appId, {
             type: this.type,
-            body: this.body
+            body: 'message_' + this.body
         }, (data: ProcessData) => {
             if (data.code === 0) {
                 console.log("Executed message");
@@ -70,7 +70,7 @@ export class GuildManager implements Manager {
         const executorManager: ExecutorManager = ExecutorManager.instance;
         executorManager.execute(this.botId, this.appId, {
             type: this.type,
-            body: this.body
+            body: 'guild_' + this.body
         }, (data) => {
             console.log("Executed guild");
         });
@@ -91,7 +91,7 @@ export class ChannelManager implements Manager {
         const executorManager: ExecutorManager = ExecutorManager.instance;
         executorManager.execute(this.botId, this.appId, {
             type: this.type,
-            body: this.body
+            body: 'channel_' + this.body
         }, (data) => {
             console.log("Executed channel");
         });
