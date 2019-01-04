@@ -9,7 +9,7 @@ import { wait } from './until';
 import path = require('path');
 import { CoreOptions } from 'request';
 import { HTTPRequest } from './http';
-import { MessageManager } from './manager';
+import { MessageManager, GuildEventType, GuildManager } from './manager';
 
 export class ProcessData {
     public botId: string = "";
@@ -124,6 +124,13 @@ export class ExecutorManager {
         const executor: BotExecutor = this.executor(appId, botId, BotExecuteType.MESSAGE);
         (executor.manager as MessageManager).type = type;
         (executor.manager as MessageManager).body = body;
+        return executor;
+    }
+
+    public guild(appId: string, botId: string, type: GuildEventType, body: any): BotExecutor {
+        const executor: BotExecutor = this.executor(appId, botId, BotExecuteType.GUILD);
+        (executor.manager as GuildManager).type = type;
+        (executor.manager as GuildManager).body = body;
         return executor;
     }
 

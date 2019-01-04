@@ -1,5 +1,5 @@
 import express from 'express';
-import { MessageController, BotController } from './controller';
+import { MessageController, BotController, GuildController } from './controller';
 import request from 'request';
 import { wait } from './until';
 import { parse, UrlWithStringQuery } from 'url';
@@ -88,6 +88,7 @@ export class HTTPManager {
         this.app.use(this.middleware);
         this.app.use('/message', MessageController);
         this.app.use('/bot', BotController);
+        this.app.use('/guild', GuildController);
     }
 
     public middleware(req: express.Request, res: express.Response, next: express.NextFunction) {

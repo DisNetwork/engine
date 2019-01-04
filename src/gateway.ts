@@ -196,14 +196,12 @@ export class GatewayManager implements Manager {
                 if (guildUnavailable !== undefined && guildUnavailable.unavailable) {
                     guildUnavailable.unavailable = false;
                     this.guilds.set(guildUnavailable.id.id, guildUnavailable);
-                    // TODO load execute
                     this.executor.fire('POST', 'guild/load', {
                         id: guild.id.id,
                         g: guild,
                         c: channels
                     });
                 } else {
-                    // TODO join execute
                     this.executor.fire('POST', 'guild/join', {
                         id: guild.id.id,
                         g: guild,
@@ -211,40 +209,33 @@ export class GatewayManager implements Manager {
                     });
                 }
             } else if (message.eventName === GatewayEvent.GUILD_UPADTE) { // When anything in the guild updated
-                // TODO update execute
                 this.executor.fire('POST', 'guild/update', {
                     g: message.data
                 });
             } else if (message.eventName === GatewayEvent.GUILD_DELETE) { // When delete guild
-                // TODO delete execute
                 this.executor.fire('POST', 'guild/delete', {
                     g: message.data
                 });
             } else if (message.eventName === GatewayEvent.GUILD_BAN_ADD) { // When someone banned
-                // TODO ban add execute
                 this.executor.fire('POST', 'guild/ban/add', {
                     id: message.data.guild_id,
                     user: message.data.user
                 });
             } else if (message.eventName === GatewayEvent.GUILD_BAN_REMOVE) { // When someone unbanned
-                // TODO ban remove execute
                 this.executor.fire('POST', 'guild/ban/remove', {
                     id: message.data.guild_id,
                     user: message.data.user
                 });
             } else if (message.eventName === GatewayEvent.GUILD_EMOJIS_UPDATE) { // When guild updates the emoji
-                // TODO emojis update execute
-                this.executor.fire('POST', 'guild/emojis', {
+                this.executor.fire('POST', 'guild/update/emojis', {
                     id: message.data.guild_id,
                     emojis: message.data.emojis
                 });
             } else if (message.eventName === GatewayEvent.GUILD_INTERGRATIONS_UPDATE) { // When integrations update
-                // TODO integrations update execute
-                this.executor.fire('POST', 'guild/integrations', {
+                this.executor.fire('POST', 'guild/update/integrations', {
                     g: message.data.guild_id
                 });
             } else if (message.eventName === GatewayEvent.GUILD_MEMBER_ADD) { // When member add
-                // TODO member add execute
                 this.executor.fire('POST', 'guild/member/add', {
                     g: message.data.guild_id,
                     user: message.data.user,
@@ -255,13 +246,11 @@ export class GatewayManager implements Manager {
                     mute: message.data.mute
                 });
             } else if (message.eventName === GatewayEvent.GUILD_MEMBER_REMOVE) { // When member removes
-                // TODO member remove execute
                 this.executor.fire('POST', 'guild/member/remove', {
                     g: message.data.guild_id,
                     user: message.data.user
                 });
             } else if (message.eventName === GatewayEvent.GUILD_MEMBER_UPDATE) { // When member updates
-                // TODO member update execute
                 this.executor.fire('POST', 'guild/member/update', {
                     g: message.data.guild_id,
                     roles: message.data.roles,

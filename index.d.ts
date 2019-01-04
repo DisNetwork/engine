@@ -15,7 +15,17 @@ export declare enum BotExecuteType {
     /**
      * Runs a gateway to receive events and set the activity of the bot
      */
-    GATEWAY = 0
+    GATEWAY = 0,
+
+    /**
+     * Execute message events
+     */
+    MESSAGE = 1,
+
+    /**
+     * Execute guild events
+     */
+    GUILD = 2
 }
 
 /**
