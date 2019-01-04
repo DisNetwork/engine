@@ -1,3 +1,4 @@
+import { CloudEngine } from './cloud/index';
 import 'colors';
 import { textSync } from 'figlet';
 import { HTTPManager } from './http';
@@ -29,6 +30,7 @@ async function start() {
         .option('-t, --executor-timeout <timeout>', 'Change the executor protocol timeout ( default: 20 seconds )')
         .option('-o, --host <host>', 'Change the host ( default: localhost )')
         .option('-d, --debug', 'Enable the debug mode for the executor protocol')
+        .option('-c, --cloud [file]', 'Set the JS file that supports the cloud')
         .parse(process.argv);
     let loggerLevel: LoggerLevel = LoggerLevel.INFO;
     let apps: any;
@@ -42,6 +44,8 @@ async function start() {
     let executePort: number = 2020;
     let executorTimeout: number = 20 * 1000;
     let debug: boolean = false;
+    let cloud: boolean = false;
+    let cloudFile: string = "./cloud.js";
     if (program.logLevel) {
         loggerLevel = program.logLevel;
     }
@@ -79,6 +83,12 @@ async function start() {
         debug = program.debug;
         console.log("Warning! ".yellow + "Executor protocol DEBUG mode is ".cyan + "ENABLED".green);
     }
+    if (program.cloud) {
+        if (program.cloud !== true) {
+            cloudFile = "./" + program.cloud;
+        }
+        cloud = true;
+    }
     // Start the http server
     const httpServer: HTTPManager = new HTTPManager(httpPort);
     const httpSpinner = ora({
@@ -107,7 +117,7 @@ async function start() {
         endpoint,
         loggerLevel,
         debug,
-        undefined,
+        cloud ? require(cloudFile) : undefined,
         apps,
         bots
     );
