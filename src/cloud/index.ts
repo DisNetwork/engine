@@ -8,6 +8,8 @@ export interface CloudEngine {
     users: CloudDatabase.Users;
     apps: CloudDatabase.Apps;
     bots: CloudDatabase.Bots;
+
+    init(): void;
 }
 
 // Export everything from database

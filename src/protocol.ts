@@ -61,6 +61,9 @@ export class ExecutorManager {
                 console.log('[Local Bots] '.green + 'Loaded! '.green + ("" + botId).reset);
             }
         }
+        if (cloud !== undefined) {
+            cloud.init();
+        }
     }
 
     public execute(botId: string, appId: string, payload: any, listener: (data: ProcessData) => void) {
