@@ -106,11 +106,9 @@ class Instance {
 
     public start(_process: Process): void {
         if (this.socket === undefined) {
-            this.log('Pre start process -> ' + _process.id);
             this.preStart.push(_process);
             return;
         }
-        this.log('Processing -> ' + _process.id);
         this.processes.set(_process.id, _process);
         this.socket.emit('start', {
             id: _process.id,
@@ -120,7 +118,6 @@ class Instance {
     }
 
     public done(id: string): void {
-        this.log('Done from processing -> ' + id);
         this.processes.delete(id);
     }
 
@@ -179,7 +176,6 @@ class Instance {
         this.lifecycle();
         this.preStart.forEach((_process: Process) => {
             if (this.socket !== undefined) {
-                this.log('Starting to process -> ' + _process.id);
                 this.processes.set(_process.id, _process);
                 this.socket.emit('start', {
                     id: _process.id,

@@ -316,7 +316,7 @@ export class GatewayManager implements Manager {
                     gid: message.data.guild_id
                 });
             } else if (message.eventName === GatewayEvent.PRESENCE_UPDATE) { // When presence update
-                this.executor.fire('POST', 'presence/update', {
+                this.executor.fire('POST', 'user/presence/update', {
                     user: message.data.user,
                     roles: message.data.roles,
                     game: message.data.game,

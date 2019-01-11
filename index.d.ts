@@ -30,7 +30,12 @@ export declare enum BotExecuteType {
     /**
      * Execute channel events
      */
-    CHANNEL = 3
+    CHANNEL = 3,
+
+    /**
+     * Execute user events
+     */
+    USER = 4
 }
 
 /**

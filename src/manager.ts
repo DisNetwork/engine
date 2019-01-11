@@ -97,3 +97,24 @@ export class ChannelManager implements Manager {
         });
     }
 }
+
+export class UserManager implements Manager {
+    public type: 'presence_update' = 'presence_update';
+    public body: any;
+
+    public constructor(
+        public botId: string,
+        public appId: string
+    ) {
+    }
+
+    public execute(): void {
+        const executorManager: ExecutorManager = ExecutorManager.instance;
+        executorManager.execute(this.botId, this.appId, {
+            type: 'user_' + this.type,
+            body: this.body
+        }, (data) => {
+            return;
+        });
+    }
+}

@@ -9,7 +9,7 @@ import { wait } from './until';
 import path = require('path');
 import { CoreOptions } from 'request';
 import { HTTPRequest } from './http';
-import { MessageManager, GuildEventType, GuildManager, ChannelManager, MessageEventType } from './manager';
+import { MessageManager, GuildEventType, GuildManager, ChannelManager, MessageEventType, UserManager } from './manager';
 
 export class ProcessData {
     public botId: string = "";
@@ -144,6 +144,14 @@ export class ExecutorManager {
         return executor;
     }
 
+    public user(
+        appId: string, botId: string, body: any
+    ): BotExecutor {
+        const executor: BotExecutor = this.executor(appId, botId, BotExecuteType.USER);
+        (executor.manager as UserManager).body = body;
+        return executor;
+    }
+
     public has(name: string): boolean {
         return this.map.has(name);
     }
@@ -221,7 +229,7 @@ export class ExecutorProtocol {
                 botId: botId
             };
             this.listeners.set(id, listener);
-            this.tokens.set(id, token);
+            this.tokens.set(botId, token);
             this.socket.emit('start', data);
         }
     }
