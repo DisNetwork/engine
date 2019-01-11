@@ -81,6 +81,13 @@ export class GatewayManager implements Manager {
         }
     }
 
+    public close() {
+        if (this.webSocket !== undefined) {
+            this.webSocket.close(1000);
+            this.webSocket = undefined;
+        }
+    }
+
     private onConnect(): void {
         this.logger.info("[Gateway] Connected!");
         this.lifecycle();
