@@ -9,7 +9,6 @@ import request from 'request';
 import { wait } from './until';
 import { parse, UrlWithStringQuery } from 'url';
 import { json, urlencoded } from 'body-parser';
-import { ExecutorManager } from './protocol';
 
 export class HTTPRequest {
     public done: boolean = false;
@@ -26,9 +25,9 @@ export class HTTPRequest {
         private tokenHeader: boolean,
         private token: string
     ) {
+        console.log('[HTTP] <- ', url, `( ${options.body === undefined ? "0" : ("" + options.body).length} bytes )`);
         const parsedUrl: UrlWithStringQuery = parse(this.url);
         // Protect bots from stealing their tokens by other hostnames
-        const execM: ExecutorManager = ExecutorManager.instance;
         if ((parsedUrl.hostname !== "discordapp.com" && parsedUrl.hostname !== 'localhost') && this.tokenHeader) {
             return;
         }
@@ -52,7 +51,9 @@ export class HTTPRequest {
             for (const option in this.options) {
                 (requestOptions as any)[option] = (this.options as any)[option];
             }
-            this.request = request(url, requestOptions, this.callback);
+            this.request = request(url, requestOptions, (err: Error, response: request.Response, body: any) => {
+                this.callback(err, response, body);
+            });
             while (this.timeout > 0) {
                 if (this.done) {
                     break;
@@ -72,6 +73,7 @@ export class HTTPRequest {
     }
 
     private callback(error: Error, response: request.Response, body: any): void {
+        console.log('[HTTP] -> ', response.request.uri.href, `( ${response.statusCode} )`);
         this.done = true;
         if (error) {
             this.error = error;

@@ -36,9 +36,9 @@ router.post('/activity', (req: Request, res: Response) => {
             };
         }
         (executor.manager as GatewayManager).send(message);
-        return res.json({ code: 0 });
+        return res.sendStatus(200);
     }
-    return res.send({ code: 1});
+    return res.sendStatus(201);
 });
 
 export const BotController: Router = router;

@@ -68,7 +68,7 @@ export class ExecutorManager {
         const token: string = this.bots[botId].token;
         const timeout: number = 5000;
         const uuid: string = v1();
-        this.protocol.execute(`${botId}${uuid}`, botId, token, appPath, timeout, payload, listener);
+        this.protocol.execute(`${botId}${uuid}`, botId, token, appPath, appId, timeout, payload, listener);
     }
 
     public executor(
@@ -208,7 +208,7 @@ export class ExecutorProtocol {
     }
 
     public execute(
-        id: string, botId: string, token: string, p: string,
+        id: string, botId: string, token: string, p: string, appId: string,
         timeout: number, payload: any, listener: (data: ProcessData) => void
     ) {
         if (this.socket !== undefined) {
@@ -217,6 +217,7 @@ export class ExecutorProtocol {
                 path: p,
                 timeout: timeout,
                 payload: payload,
+                appId: appId,
                 botId: botId
             };
             this.listeners.set(id, listener);
@@ -293,13 +294,15 @@ export class ExecutorProtocol {
                     id: id
                 });
             }
-        } else if (!url.startsWith("https://discordapp.com")) {
+            return;
+        } else if (!url.startsWith("https://discordapp.com") && !url.startsWith("http://localhost")) {
             if (this.socket !== undefined) {
                 this.socket.emit('http', {
                     code: HTTPCode.REJECTED_HOSTNAME,
                     id: id
                 });
             }
+            return;
         }
         const options: CoreOptions = data.options;
         const tokenHeader: boolean = data.tokenHeader;
