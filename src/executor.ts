@@ -64,6 +64,7 @@ class Instance {
         this.log('Starting...');
         const execPath: string = process.execPath;
         const args: string[] = [
+            "--max-old-space-size=64",
             this.path,
             "-h",
             host,
