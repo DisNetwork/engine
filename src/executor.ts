@@ -143,7 +143,7 @@ class Instance {
         if (this.processes.size >= 60) {
             if (this.timeoutType === InstanceTimeoutType.STRESS) {
                 this.timeout += 1;
-                if (this.timeout >= 30 * 1000) {
+                if (this.timeout >= 60 * 1000) {
                     // TODO kill the instance saftey
                     // TODO notify to the developer that you instance is broken.
                     this.process.kill();
