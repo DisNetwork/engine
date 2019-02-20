@@ -209,6 +209,10 @@ class Instance {
     }
 
     private onClose(code: number): void {
+        if (this._state === InstanceState.BROKEN) {
+            this.log('Killed due to being broken for long time!');
+            return;
+        }
         this._state = InstanceState.BROKEN;
         this.log('Closed! with code: ' + code);
     }
