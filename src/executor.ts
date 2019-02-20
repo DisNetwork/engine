@@ -116,6 +116,7 @@ class Instance {
             botId: _process.botId,
             payload: _process.payload
         });
+        // New process has been requested to start in the instance
     }
 
     public done(id: string): void {
@@ -131,12 +132,20 @@ class Instance {
     }
 
     private async lifecycle(): Promise<any> {
-        // Convert to STRESS when handling 60 requests
+
+        // The instance become to be useful. When it's processing many requests.
+        // And, we should wait till that the instance finish from it's work.
+        // So, we can give it more requests to process.
+        // But, The instance become to be stressful for long time.
+        // Which, it means that the instance is broken for us.
+        // So, we kill the instance to start the new one.
+        // But, with fresh requests to process.
         if (this.processes.size >= 60) {
             if (this.timeoutType === InstanceTimeoutType.STRESS) {
                 this.timeout += 1;
                 if (this.timeout >= 30 * 1000) {
                     // TODO kill the instance saftey
+                    // TODO notify to the developer that you instance is broken.
                     this.process.kill();
                     this._state = InstanceState.BROKEN;
                 }
@@ -146,11 +155,15 @@ class Instance {
                 this.timeout = 0;
             }
         } else if (this.processes.size <= 0) {
-            // When the instance is useless ( no one use it )
+
+
+            // The instance become to be useless. When, there's nothing to do with it.
+            // In other words, It means that there's no request to process on it.
+            // And, We should kill it for running other instances.
+            // After, the timeout of the useless state finish.
             if (this.timeoutType === InstanceTimeoutType.USELESS) {
                 this.timeout += 1;
                 if (this.timeout >= 30 * 1000) {
-                    // TODO kill the instance safety
                     this.process.kill();
                     this._state = InstanceState.BROKEN;
                 }
@@ -160,8 +173,15 @@ class Instance {
                 this.timeout = 0;
             }
         } else {
-            // When the instance is handling and working very well
-            this._state = InstanceState.NORMAL;
+
+
+            // The instance become to be normal when the instance
+            // is handling normal number of processes. And, This looks good.
+            // Because, It means that the instance is working well
+            // And, nothing to worry about it.
+            if (this._state !== InstanceState.NORMAL) {
+                this._state = InstanceState.NORMAL;
+            }
         }
         for (const _process of this.processes.values()) {
             _process.timeout -= 1;
@@ -263,19 +283,24 @@ io.on('start', (data: any) => {
         instance = new Instance(instanceId, path);
         instance.init();
         instanceById.set(instanceId, instance);
+        // When new instance created when nothing is exist
         console.log('[AutoScale] Created a new instance ' + `[${instance.id}]`);
     } else {
         for (const i of appInstances) {
+            // Instances of the app and each state of them
             if (i.state === InstanceState.USELESS) {
                 console.log('[AutoScale] Processing in USELESS Instance ' + `[${i.id}]`);
                 instance = i;
+                // Any useless instance take them to make them useful
                 break;
             } else if (i.state === InstanceState.NORMAL) {
                 console.log('[AutoScale] Processing in NORMAL Instance ' + `[${i.id}]`);
                 instance = i;
+                // Any normal instance will be taken here in the next stage
                 break;
             } else if (i.state === InstanceState.BROKEN || i.state === InstanceState.STESS) {
                 console.log('[AutoScale] Skipped STRESS | BROKEN Instance ' + `[${i.id}]`);
+                // Ignore any stress and broken instance
                 continue;
             }
         }
@@ -285,6 +310,7 @@ io.on('start', (data: any) => {
             instance.init();
             appInstances.push(instance);
             instanceById.set(instanceId, instance);
+            // Create new instance when there's no instance free to use
             console.log('[AutoScale] Created a new instance ' + `[${instance.id}]`);
         }
     }
